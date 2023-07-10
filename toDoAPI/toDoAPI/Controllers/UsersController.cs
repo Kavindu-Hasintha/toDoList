@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using toDoAPI.Dto;
 using toDoAPI.Models;
 using toDoAPI.Services.Users;
@@ -50,12 +51,26 @@ namespace toDoAPI.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (userCreate.Name.Length == 0 || userCreate.Email.Length == 0 || userCreate.Password.Length == 0)
+            {
+                ModelState.AddModelError("UserError", "Please fill all the fields.");
+                return StatusCode(422, ModelState);
+            }
+
+            var emailValidation = new EmailAddressAttribute();
+
+            if (!emailValidation.IsValid(userCreate.Email))
+            {
+                ModelState.AddModelError("UserError", "Invalid email address.");
+                return StatusCode(422, ModelState);
+            }
+
             var user = _userRepository.GetUsers()
                 .Where(x => x.Email == userCreate.Email).FirstOrDefault();
 
             if (user != null)
             {
-                ModelState.AddModelError("", "User already exists.");
+                ModelState.AddModelError("UserError", "User already exists.");
                 return StatusCode(422, ModelState);
             }
 
