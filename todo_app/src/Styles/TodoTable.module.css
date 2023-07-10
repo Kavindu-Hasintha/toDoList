@@ -1,0 +1,5 @@
+.tableDiv {
+  max-height: 450px;
+  overflow: scroll;
+  height: 450px;
+}
