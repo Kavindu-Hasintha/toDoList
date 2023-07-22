@@ -36,8 +36,14 @@ function Home() {
       <Header name={userData.name} onHandleLogOut={handleLogOut} pageId="2" />
       <div className="my-4">
         <Routes>
-          <Route path="/" element={<TodoTable userId={userId} />} />
-          <Route path="setting" element={<Setting userId={userId} />} />
+          <Route
+            path="/"
+            element={<TodoTable userId={userId} userType="0" />}
+          />
+          <Route
+            path="setting"
+            element={<Setting userId={userId} userType="0" />}
+          />
         </Routes>
       </div>
 
