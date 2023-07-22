@@ -50,7 +50,11 @@ function Setting(props) {
         })
         .then((res) => {
           toast.success(res.data);
-          window.location.reload(false);
+          if (props.userType === "0") {
+            window.location.reload(false);
+          } else {
+            navigate(-1);
+          }
         })
         .catch((err) => {
           toast.error("Update failed.");
@@ -78,7 +82,11 @@ function Setting(props) {
           password: newPassword,
         })
         .then((res) => {
-          window.location.reload(false);
+          if (props.userType === "0") {
+            window.location.reload(false);
+          } else {
+            navigate(-1);
+          }
           toast.success(res.data);
         })
         .catch((err) => {
@@ -92,7 +100,11 @@ function Setting(props) {
       .delete("https://localhost:7068/api/Users/" + userData.id)
       .then((res) => {
         toast.success(res.data);
-        navigate("/signup");
+        if (props.userType === "0") {
+          navigate("/signup");
+        } else {
+          navigate(-1);
+        }
       })
       .catch((err) => {
         toast.error("Deletion failed.");
@@ -239,9 +251,14 @@ function Setting(props) {
           </div>
           <div className="row pb-4">
             <div className="col-6">
-              <button className="btn btn-danger w-auto" onClick={deleteAccount}>
-                Delete My Account
-              </button>
+              {userData.id !== 1 && (
+                <button
+                  className="btn btn-danger w-auto"
+                  onClick={deleteAccount}
+                >
+                  Delete My Account
+                </button>
+              )}
             </div>
             <div className="col-6">
               <button

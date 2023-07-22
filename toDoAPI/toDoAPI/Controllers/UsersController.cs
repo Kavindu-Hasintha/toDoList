@@ -24,6 +24,20 @@ namespace toDoAPI.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
+        public IActionResult GetUsers()
+        {
+            var users = _mapper.Map<List<UserChangeDetailsDto>>(_userRepository.GetUsers());
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return Ok(users);
+        }
+
         [HttpGet("{userId}")]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(400)]

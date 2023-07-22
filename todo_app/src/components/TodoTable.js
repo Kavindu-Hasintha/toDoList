@@ -5,8 +5,10 @@ import "react-toastify/dist/ReactToastify.css";
 import TodoTableStyles from "../Styles/TodoTable.module.css";
 import Dialog from "@mui/material/Dialog";
 import { TextField } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 function TodoTable(props) {
+  const navigate = useNavigate();
   const [todoData, setTodoData] = useState([
     {
       id: 0,
@@ -31,7 +33,11 @@ function TodoTable(props) {
   const handleClose = () => {
     setPopup(false);
     emptyFields();
-    window.location.reload(false);
+    if (props.userType === "0") {
+      window.location.reload(false);
+    } else {
+      navigate(-1);
+    }
   };
 
   const editBoxOpen = (todoData) => {
@@ -88,7 +94,11 @@ function TodoTable(props) {
       .delete("https://localhost:7068/api/Todos/" + taskId)
       .then((res) => {
         toast.success(res.data);
-        window.location.reload(false);
+        if (props.userType === "0") {
+          window.location.reload(false);
+        } else {
+          navigate(-1);
+        }
       })
       .catch((err) => {
         toast.error("Deletion failed.");
@@ -113,6 +123,17 @@ function TodoTable(props) {
           <h2 className="text-start ps-4">toDo List</h2>
         </div>
         <div className="col-4 d-flex justify-content-end">
+          {props.userType === "1" && (
+            <button
+              type="button"
+              className="btn btn-primary me-4 px-4"
+              onClick={() => {
+                navigate(-1);
+              }}
+            >
+              Back
+            </button>
+          )}
           <button
             type="button"
             className="btn btn-primary me-4 px-4"
