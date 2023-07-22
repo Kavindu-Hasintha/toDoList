@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using toDoAPI.Data;
 using toDoAPI.Models;
 
@@ -38,12 +39,28 @@ namespace toDoAPI.Services.Users
             return Save();
         }
 
+        public bool UpdateUser(User user)
+        {
+            _context.Update(user);
+            return Save();
+        }
+
+        public bool DeleteUser(User user)
+        {
+            _context.Remove(user);
+            return Save();
+        }
+
         public bool Save()
         {
             var saved = _context.SaveChanges();
             return saved > 0 ? true : false;
         }
 
-
+        public bool IsEmailValid(string email)
+        {
+            var emailValidation = new EmailAddressAttribute();
+            return emailValidation.IsValid(email);
+        }
     }
 }

@@ -51,6 +51,12 @@ namespace toDoAPI.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (todoCreate.TaskName.Length == 0 || todoCreate.StartDate.ToString().Length == 0 || todoCreate.DueDate.ToString().Length == 0)
+            {
+                ModelState.AddModelError("TodoError", "Please fill all the fields.");
+                return StatusCode(422, ModelState);
+            }
+
             var todo = _todoRepository.GetTodos()
                 .Where(t => t.TaskName.Trim().ToUpper() == todoCreate.TaskName.TrimEnd().ToUpper())
                 .FirstOrDefault();
@@ -97,6 +103,12 @@ namespace toDoAPI.Controllers
             if (!_todoRepository.TodoExists(todoUpdate.Id))
             {
                 return NotFound();
+            }
+
+            if (todoUpdate.TaskName.Length == 0 || todoUpdate.StartDate.ToString().Length == 0 || todoUpdate.DueDate.ToString().Length == 0)
+            {
+                ModelState.AddModelError("TodoError", "Please fill all the fields.");
+                return StatusCode(422, ModelState);
             }
 
             if (!ModelState.IsValid)

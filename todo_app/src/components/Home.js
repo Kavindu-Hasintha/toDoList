@@ -1,10 +1,11 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import HomeStyles from "../Styles/Home.module.css";
 import TodoTable from "./TodoTable";
+import Setting from "./Setting";
 
 function Home() {
   const navigate = useNavigate();
@@ -26,19 +27,18 @@ function Home() {
       });
   }, []);
 
-  const handleSignupPage = () => {
+  const handleLogOut = () => {
     navigate("/");
   };
 
   return (
     <div className={HomeStyles.backgroundImage}>
-      <Header
-        name={userData.name}
-        onHandleTopButton={handleSignupPage}
-        pageId="0"
-      />
+      <Header name={userData.name} onHandleLogOut={handleLogOut} pageId="2" />
       <div className="my-4">
-        <TodoTable userId={userId} />
+        <Routes>
+          <Route path="/" element={<TodoTable userId={userId} />} />
+          <Route path="setting" element={<Setting userId={userId} />} />
+        </Routes>
       </div>
 
       <Footer />

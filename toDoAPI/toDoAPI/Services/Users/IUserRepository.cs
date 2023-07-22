@@ -9,6 +9,9 @@ namespace toDoAPI.Services.Users
         User GetUser(int userId);
         bool UserExist(int userId);
         bool CreateUser(User user);
+        bool UpdateUser(User user);
+        bool DeleteUser(User user);
         bool Save();
+        bool IsEmailValid(string email);
     }
 }
