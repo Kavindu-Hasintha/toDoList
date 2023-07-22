@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using toDoAPI.Dto;
 using toDoAPI.Models;
+using toDoAPI.Services.Todos;
 using toDoAPI.Services.Users;
 
 namespace toDoAPI.Controllers
@@ -13,11 +14,13 @@ namespace toDoAPI.Controllers
     public class UsersController : Controller
     {
         private readonly IUserRepository _userRepository;
+        private readonly ITodoRepository _todoRepository;
         private readonly IMapper _mapper;
 
-        public UsersController(IUserRepository userRepository, IMapper mapper)
+        public UsersController(IUserRepository userRepository, ITodoRepository todoRepository, IMapper mapper)
         {
             _userRepository = userRepository;
+            _todoRepository = todoRepository;
             _mapper = mapper;
         }
 
@@ -32,6 +35,26 @@ namespace toDoAPI.Controllers
             }
 
             var user = _mapper.Map<UserDto>(_userRepository.GetUser(userId));
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return Ok(user);
+        }
+
+        [HttpGet("getuserdetails{userId}")]
+        [ProducesResponseType(200, Type = typeof(User))]
+        [ProducesResponseType(400)]
+        public IActionResult GetUserDetails(int userId)
+        {
+            if (!_userRepository.UserExist(userId))
+            {
+                return NotFound();
+            }
+
+            var user = _mapper.Map<UserChangeDetailsDto>(_userRepository.GetUser(userId));
 
             if (!ModelState.IsValid)
             {
@@ -57,9 +80,7 @@ namespace toDoAPI.Controllers
                 return StatusCode(422, ModelState);
             }
 
-            var emailValidation = new EmailAddressAttribute();
-
-            if (!emailValidation.IsValid(userCreate.Email))
+            if (!_userRepository.IsEmailValid(userCreate.Email))
             {
                 ModelState.AddModelError("UserError", "Invalid email address.");
                 return StatusCode(422, ModelState);
@@ -115,6 +136,82 @@ namespace toDoAPI.Controllers
 
             return Ok(user.Id);
         }
-        
+
+        [HttpPut]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateUserDetails([FromBody] UserChangeDetailsDto userUpdate)
+        {
+            if (userUpdate == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_userRepository.UserExist(userUpdate.Id))
+            {
+                return NotFound();
+            }
+
+            if (userUpdate.Name.Length == 0 || userUpdate.Email.Length == 0 || userUpdate.Password.Length == 0)
+            {
+                ModelState.AddModelError("UserError", "Please fill all the fields.");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!_userRepository.IsEmailValid(userUpdate.Email))
+            {
+                ModelState.AddModelError("UserError", "Invalid email address.");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var userMap = _mapper.Map<User>(userUpdate);
+
+            if (!_userRepository.UpdateUser(userMap))
+            {
+                ModelState.AddModelError("UserError", "Something went wrong while updating user");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully updated.");
+        }
+
+        [HttpDelete("{userId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteUser(int userId)
+        {
+            if (!_userRepository.UserExist(userId))
+            {
+                return NotFound();
+            }
+
+            var userToDelete = _userRepository.GetUser(userId);
+
+            var todos = _todoRepository.GetTodos(userId);
+
+            foreach (var t in todos)
+            {
+                if (!_todoRepository.DeleteTodo(t))
+                {
+                    ModelState.AddModelError("UserError", "Something went wrong while deleting.");
+                    return StatusCode(500, ModelState);
+                }
+            }
+
+            if (!_userRepository.DeleteUser(userToDelete))
+            {
+                ModelState.AddModelError("UserError", "Something went wrong while deleting.");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully deleted.");
+        }
     }
 }

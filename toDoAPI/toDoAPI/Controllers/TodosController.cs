@@ -105,6 +105,12 @@ namespace toDoAPI.Controllers
                 return NotFound();
             }
 
+            if (todoUpdate.TaskName.Length == 0 || todoUpdate.StartDate.ToString().Length == 0 || todoUpdate.DueDate.ToString().Length == 0)
+            {
+                ModelState.AddModelError("TodoError", "Please fill all the fields.");
+                return StatusCode(422, ModelState);
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest();
