@@ -23,7 +23,7 @@ function Home() {
         setUserData(res.data);
       })
       .catch((err) => {
-        console.log(err);
+        console.log("Error in Home.js");
       });
   }, []);
 

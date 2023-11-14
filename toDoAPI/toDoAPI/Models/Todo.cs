@@ -4,6 +4,7 @@ namespace toDoAPI.Models
 {
     public class Todo
     {
+        // Add details to the columns
         public int Id { get; set; }
         [Required]
         [MaxLength(255)]
