@@ -1,3 +1,6 @@
+global using Microsoft.EntityFrameworkCore;
+global using toDoAPI.Models;
+global using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using toDoAPI.Data;
 using toDoAPI.Services.Todos;
@@ -20,7 +23,10 @@ builder.Services.AddScoped<ITodoRepository, TodoRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<DataContext>();
+builder.Services.AddDbContext<DataContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]);
+});
 
 var app = builder.Build();
 

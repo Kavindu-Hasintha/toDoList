@@ -1,19 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace toDoAPI.Models
+﻿namespace toDoAPI.Models
 {
     public class Todo
     {
-        // Add details to the columns
+        [Key]
         public int Id { get; set; }
+
         [Required]
         [MaxLength(255)]
         public string TaskName { get; set; }
+
         [Required]
         public DateTime StartDate { get; set; }
+
         [Required]
         public DateTime DueDate { get; set; }
+
         [Required]
+        public int UserId { get; set; }
+
         public User User { get; set; }
     }
 }

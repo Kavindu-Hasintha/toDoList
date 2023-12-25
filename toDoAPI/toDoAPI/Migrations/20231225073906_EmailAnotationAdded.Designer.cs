@@ -12,14 +12,14 @@ using toDoAPI.Data;
 namespace toDoAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230708052338_seedDataUsers")]
-    partial class seedDataUsers
+    [Migration("20231225073906_EmailAnotationAdded")]
+    partial class EmailAnotationAdded
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.10")
+                .HasAnnotation("ProductVersion", "6.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -71,30 +71,30 @@ namespace toDoAPI.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Password")
+                    b.Property<byte[]>("PasswordHash")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("TokenCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("TokenExpired")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserRole")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "kavindu@gmail.com",
-                            Name = "Kavindu Hasintha",
-                            Password = "kavindu"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Email = "ajith@gmail.com",
-                            Name = "Ajith Hewage",
-                            Password = "ajith"
-                        });
                 });
 
             modelBuilder.Entity("toDoAPI.Models.Todo", b =>

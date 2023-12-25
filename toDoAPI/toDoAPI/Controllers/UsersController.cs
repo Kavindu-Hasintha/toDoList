@@ -124,7 +124,7 @@ namespace toDoAPI.Controllers
 
             return Ok("Account created successfully.");
         }
-        
+        /*
         [HttpPost("getUserId")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -150,7 +150,7 @@ namespace toDoAPI.Controllers
 
             return Ok(user.Id);
         }
-
+        */
         [HttpPut]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

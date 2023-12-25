@@ -17,12 +17,12 @@ namespace toDoAPI.Services.Users
         {
             return _context.Users.OrderBy(x => x.Id).ToList();
         }
-
+        /*
         public User GetUser(string email, string password)
         {
             return _context.Users.Where(x => x.Email == email && x.Password == password).FirstOrDefault();
         }
-
+        */
         public User GetUser(int userId)
         {
             return _context.Users.Where(x => x.Id == userId).FirstOrDefault();
