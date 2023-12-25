@@ -78,6 +78,7 @@ namespace toDoAPI.Controllers
             return Ok(user);
         }
 
+        /*
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -124,6 +125,8 @@ namespace toDoAPI.Controllers
 
             return Ok("Account created successfully.");
         }
+        */
+
         /*
         [HttpPost("getUserId")]
         [ProducesResponseType(204)]
@@ -151,6 +154,8 @@ namespace toDoAPI.Controllers
             return Ok(user.Id);
         }
         */
+
+        /*
         [HttpPut]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -194,7 +199,9 @@ namespace toDoAPI.Controllers
 
             return Ok("Successfully updated.");
         }
+        */
 
+        /*
         [HttpDelete("{userId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -227,5 +234,6 @@ namespace toDoAPI.Controllers
 
             return Ok("Successfully deleted.");
         }
+        */
     }
 }

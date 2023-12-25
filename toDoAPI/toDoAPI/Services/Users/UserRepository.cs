@@ -33,27 +33,32 @@ namespace toDoAPI.Services.Users
             return _context.Users.Any(x => x.Id == userId);
         }
 
-        public bool CreateUser(User user)
+        public async Task<bool> UserExists(string email)
+        {
+            return await _context.Users.AnyAsync(u => u.Email == email);
+        }
+
+        public async Task<bool> RegisterUser(User user)
         {
             _context.Add(user);
-            return Save();
+            return await Save();
         }
 
-        public bool UpdateUser(User user)
+        public async Task<bool> UpdateUser(User user)
         {
             _context.Update(user);
-            return Save();
+            return await Save();
         }
 
-        public bool DeleteUser(User user)
+        public async Task<bool> DeleteUser(User user)
         {
             _context.Remove(user);
-            return Save();
+            return await Save();
         }
 
-        public bool Save()
+        public async Task<bool> Save()
         {
-            var saved = _context.SaveChanges();
+            var saved = await _context.SaveChangesAsync();
             return saved > 0 ? true : false;
         }
 

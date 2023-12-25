@@ -10,35 +10,6 @@
 			"name": "Users",
 			"item": [
 				{
-					"name": "Add user",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n  \"name\": \"Charith Asalanka\",\r\n  \"email\": \"charitha@gmail.com\",\r\n  \"password\": \"Charith\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "https://localhost:7068/api/Users",
-							"protocol": "https",
-							"host": [
-								"localhost"
-							],
-							"port": "7068",
-							"path": [
-								"api",
-								"Users"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get all users",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -187,6 +158,36 @@
 								"api",
 								"Users",
 								"getUserId"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Kavindu\",\r\n  \"email\": \"kavindu@gmail.com\",\r\n  \"password\": \"kavindu\",\r\n  \"confirmPassword\": \"kavindu\",\r\n  \"userRole\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7068/api/Auth/signup",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Auth",
+								"signup"
 							]
 						}
 					},
