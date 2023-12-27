@@ -37,6 +37,7 @@ namespace toDoAPI.Controllers
 
             return Ok(users);
         }
+        /*
 
         [HttpGet("{userId}")]
         [ProducesResponseType(200, Type = typeof(User))]
@@ -77,7 +78,7 @@ namespace toDoAPI.Controllers
 
             return Ok(user);
         }
-
+        */
         /*
         [HttpPost]
         [ProducesResponseType(204)]

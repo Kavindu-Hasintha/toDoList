@@ -1,4 +1,6 @@
-﻿namespace toDoAPI.Services.Users
+﻿using toDoAPI.Models;
+
+namespace toDoAPI.Services.Users
 {
     public class UserRepository : IUserRepository
     {
@@ -18,9 +20,11 @@
             return _context.Users.Where(x => x.Email == email && x.Password == password).FirstOrDefault();
         }
         */
-        public User GetUser(int userId)
+        public async Task<Object> GetUserAsync(int userId)
         {
-            return _context.Users.Where(x => x.Id == userId).FirstOrDefault();
+            // return await _context.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
+
+            return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         public async Task<User> GetUserAsync(string email)
@@ -31,6 +35,11 @@
             }
 
             return await _context.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
+        }
+
+        public async Task<User> GetUserAsyncByRefreshToken(string refreshToken)
+        {
+            return await _context.Users.Where(u => u.RefreshToken == refreshToken).FirstOrDefaultAsync();
         }
 
         public bool UserExist(int userId)
@@ -55,6 +64,22 @@
             return await Save();
         }
 
+        public async Task<bool> UpdateUserRefreshToken(int userId, string newToken, DateTime created, DateTime expires)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            user.RefreshToken = newToken;
+            user.TokenCreated = created;
+            user.TokenExpired = expires;
+
+            return await Save();
+        }
+
         public async Task<bool> DeleteUser(User user)
         {
             _context.Remove(user);
@@ -72,5 +97,6 @@
             var emailValidation = new EmailAddressAttribute();
             return emailValidation.IsValid(email);
         }
+
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace toDoAPI.Controllers
+﻿using toDoAPI.Models;
+using toDoAPI.Services.RefreshTokenService;
+
+namespace toDoAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -6,11 +9,13 @@
     {
         private readonly IUserRepository _userRepository;
         private readonly IJwtTokenService _jwtTokenService;
+        private readonly IRefreshTokenService _refreshTokenService;
 
-        public AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService)
+        public AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService)
         {
             _userRepository = userRepository;
             _jwtTokenService = jwtTokenService;
+            _refreshTokenService = refreshTokenService;
         }
 
         [HttpPost]
@@ -66,13 +71,41 @@
                 return BadRequest("Login failed!");
             }
 
-            string token = _jwtTokenService.CreateToken(user);
+            string token = await _jwtTokenService.CreateToken(user);
 
             var refreshToken = _refreshTokenService.GenerateRefreshToken();
-            SetRefreshTokenCookie(refreshToken);
+
+            var isSetRefreshToken = await _refreshTokenService.SetRefreshTokenCookie(user.Id, refreshToken);
+
+            if (!isSetRefreshToken)
+            {
+                return BadRequest("Server error!");
+            }
 
             return Ok(token);
 
+        }
+
+        [HttpPost]
+        [Route("refreshtoken")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            var user = await _userRepository.GetUserAsyncByRefreshToken(refreshToken);
+
+            if (!user.RefreshToken.Equals(refreshToken))
+            {
+                return Unauthorized("Invalid Refresh Token");
+            }
+            else if (user.TokenExpired < DateTime.UtcNow)
+            {
+                return Unauthorized("Token expired");
+            }
+
+            string token = await _jwtTokenService.CreateToken(user);
+
+            return Ok(token);
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

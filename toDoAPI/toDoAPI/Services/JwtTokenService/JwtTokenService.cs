@@ -13,7 +13,7 @@ namespace toDoAPI.Services.JwtTokenService
             _config = config;
         }
 
-        public string CreateToken(User user)
+        public async Task<string> CreateToken(User user)
         {
             string role = string.Empty;
             if (user.UserRole == 0)
@@ -37,7 +37,7 @@ namespace toDoAPI.Services.JwtTokenService
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(5),
+                expires: DateTime.Now.AddMinutes(2),
                 signingCredentials: creds
                 );
 

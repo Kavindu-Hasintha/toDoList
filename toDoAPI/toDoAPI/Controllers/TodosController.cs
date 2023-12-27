@@ -21,7 +21,7 @@ namespace toDoAPI.Controllers
             _userRepository = userRepository;
             _mapper = mapper;
         }
-
+        /*
         [HttpGet("{userId}")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Todo>))]
         public IActionResult GetTodos(int userId)
@@ -153,6 +153,6 @@ namespace toDoAPI.Controllers
 
             return Ok("Successfully Deleted.");
         }
-
+        */
     }
 }
