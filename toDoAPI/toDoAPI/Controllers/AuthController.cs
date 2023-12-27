@@ -90,22 +90,36 @@ namespace toDoAPI.Controllers
         [Route("refreshtoken")]
         public async Task<IActionResult> RefreshToken()
         {
-            var refreshToken = Request.Cookies["refreshToken"];
-
-            var user = await _userRepository.GetUserAsyncByRefreshToken(refreshToken);
-
-            if (!user.RefreshToken.Equals(refreshToken))
+            try
             {
-                return Unauthorized("Invalid Refresh Token");
+                var refreshToken = Request.Cookies["refreshToken"];
+
+                if (string.IsNullOrEmpty(refreshToken))
+                {
+                    return Unauthorized("Refresh token is missing");
+                }
+
+                var user = await _userRepository.GetUserAsyncByRefreshToken(refreshToken);
+
+                if (user == null || !user.RefreshToken.Equals(refreshToken))
+                {
+                    return Unauthorized("Invalid refresh token");
+                }
+
+                if (user.TokenExpired < DateTime.UtcNow)
+                {
+                    return Unauthorized("Token expired");
+                }
+
+                string newToken = await _jwtTokenService.CreateToken(user);
+
+                return Ok(newToken);
             }
-            else if (user.TokenExpired < DateTime.UtcNow)
+            catch (Exception ex)
             {
-                return Unauthorized("Token expired");
+                // Log the exception or handle it appropriately
+                return StatusCode(500, "Internal Server Error");
             }
-
-            string token = await _jwtTokenService.CreateToken(user);
-
-            return Ok(token);
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

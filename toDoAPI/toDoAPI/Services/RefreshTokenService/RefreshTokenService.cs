@@ -1,20 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-using toDoAPI.Services.Users;
-
-namespace toDoAPI.Services.RefreshTokenService
+﻿namespace toDoAPI.Services.RefreshTokenService
 {
     public class RefreshTokenService : IRefreshTokenService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserRepository _userRepository;
         private readonly int RefreshTokenExpirationTime = 5;
-        private readonly DataContext _context;
 
-        public RefreshTokenService(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository, DataContext context)
+        public RefreshTokenService(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository)
         {
             _httpContextAccessor = httpContextAccessor;
             _userRepository = userRepository;
-            _context = context;
         }
 
         public RefreshToken GenerateRefreshToken()
