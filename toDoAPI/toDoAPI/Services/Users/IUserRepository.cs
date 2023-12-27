@@ -1,6 +1,4 @@
-﻿using toDoAPI.Models;
-
-namespace toDoAPI.Services.Users
+﻿namespace toDoAPI.Services.Users
 {
     public interface IUserRepository
     {
@@ -9,6 +7,8 @@ namespace toDoAPI.Services.Users
         //User GetUser(string email, string password);
 
         User GetUser(int userId);
+
+        Task<User> GetUserAsync(string email);
 
         bool UserExist(int userId);
 

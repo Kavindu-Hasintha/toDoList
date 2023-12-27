@@ -1,10 +1,16 @@
 global using Microsoft.EntityFrameworkCore;
 global using toDoAPI.Models;
 global using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
-using toDoAPI.Data;
+global using Microsoft.AspNetCore.Mvc;
+global using System.Security.Cryptography;
+global using toDoAPI.Dto;
+global using toDoAPI.Services.JwtTokenService;
+global using toDoAPI.Services.Users;
+global using System.Text.Json.Serialization;
+global using toDoAPI.Data;
 using toDoAPI.Services.Todos;
 using toDoAPI.Services.Users;
+using toDoAPI.Services.JwtTokenService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +25,7 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITodoRepository, TodoRepository>();
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

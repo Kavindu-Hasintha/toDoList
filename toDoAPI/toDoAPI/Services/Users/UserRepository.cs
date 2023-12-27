@@ -1,9 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using toDoAPI.Data;
-using toDoAPI.Models;
-
-namespace toDoAPI.Services.Users
+﻿namespace toDoAPI.Services.Users
 {
     public class UserRepository : IUserRepository
     {
@@ -26,6 +21,16 @@ namespace toDoAPI.Services.Users
         public User GetUser(int userId)
         {
             return _context.Users.Where(x => x.Id == userId).FirstOrDefault();
+        }
+
+        public async Task<User> GetUserAsync(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentNullException(nameof(email), "Email cannot be null or empty.");
+            }
+
+            return await _context.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
         }
 
         public bool UserExist(int userId)
