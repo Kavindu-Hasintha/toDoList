@@ -140,7 +140,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"email\": \"eranga@gmail.com\",\r\n  \"password\": \"eranga\"\r\n}",
+							"raw": "{\r\n  \"email\": \"kavindu@gmail.com\",\r\n  \"password\": \"kavindu\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -148,7 +148,7 @@
 							}
 						},
 						"url": {
-							"raw": "https://localhost:7068/api/Users/getUserId",
+							"raw": "https://localhost:7068/api/Auth/signin",
 							"protocol": "https",
 							"host": [
 								"localhost"
@@ -156,8 +156,8 @@
 							"port": "7068",
 							"path": [
 								"api",
-								"Users",
-								"getUserId"
+								"Auth",
+								"signin"
 							]
 						}
 					},
@@ -188,6 +188,77 @@
 								"api",
 								"Auth",
 								"signup"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tasks",
+			"item": [
+				{
+					"name": "Get tasks by user Id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoia2F2aW5kdUBnbWFpbC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTcwMzg2NzA3OX0.DcGaXQlZ4Jwui-Mcd2EXqpvNDsYnlwHKtEFwRVx9SIGWbszr9zEe07HplqxkK5zU2VUpxBZuZyN1hHdxJsA2cA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:7068/api/Todos/getasksforuser",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Todos",
+								"getasksforuser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add tasks",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoia2F2aW5kdUBnbWFpbC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTcwMzg2NzA3OX0.DcGaXQlZ4Jwui-Mcd2EXqpvNDsYnlwHKtEFwRVx9SIGWbszr9zEe07HplqxkK5zU2VUpxBZuZyN1hHdxJsA2cA",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"taskName\": \"string\",\r\n  \"startDate\": \"2023-12-29\",\r\n  \"dueDate\": \"2023-12-31\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7068/api/Todos/addtask",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Todos",
+								"addtask"
 							]
 						}
 					},

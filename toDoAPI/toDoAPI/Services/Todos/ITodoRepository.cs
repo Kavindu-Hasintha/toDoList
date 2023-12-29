@@ -5,12 +5,18 @@ namespace toDoAPI.Services.Todos
     public interface ITodoRepository
     {
         ICollection<Todo> GetTodos();
-        ICollection<Todo> GetTodos(int userId);
+
+        Task<List<Todo>> GetTodos(int userId);
+
         Todo GetTodo(int todoId);
         bool TodoExists(int todoId);
-        bool CreateTodo(Todo todo);
-        bool UpdateTodo(Todo todo);
-        bool DeleteTodo(Todo todo);
-        bool Save();
+
+        Task<bool> TodoExists(int userId, string name);
+
+        Task<bool> AddTodo(Todo todo);
+
+        Task<bool> UpdateTodo(Todo todo);
+        Task<bool> DeleteTodo(Todo todo);
+        Task<bool> Save();
     }
 }

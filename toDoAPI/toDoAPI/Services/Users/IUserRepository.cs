@@ -6,13 +6,15 @@
 
         //User GetUser(string email, string password);
 
+        Task<int> GetUserId();
+
         Task<Object> GetUserAsync(int userId);
 
         Task<User> GetUserAsync(string email);
 
         Task<User> GetUserAsyncByRefreshToken(string refreshToken);
 
-        bool UserExist(int userId);
+        Task<bool> UserExist(int userId);
 
         Task<bool> UserExists(string email);
 

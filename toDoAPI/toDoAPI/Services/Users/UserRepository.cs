@@ -1,13 +1,32 @@
-﻿using toDoAPI.Models;
+﻿using System.Security.Claims;
+using toDoAPI.Models;
 
 namespace toDoAPI.Services.Users
 {
     public class UserRepository : IUserRepository
     {
         private readonly DataContext _context;
-        public UserRepository(DataContext context)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public UserRepository(DataContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        public async Task<int> GetUserId()
+        {
+            var email = string.Empty;
+            if (_httpContextAccessor.HttpContext != null)
+            {
+                email = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
+            }
+
+            var user = await GetUserAsync(email);
+            if (user == null)
+            {
+                return 0;
+            }
+            return user.Id;
         }
 
         public ICollection<User> GetUsers()
@@ -42,9 +61,9 @@ namespace toDoAPI.Services.Users
             return await _context.Users.Where(u => u.RefreshToken == refreshToken).FirstOrDefaultAsync();
         }
 
-        public bool UserExist(int userId)
+        public async Task<bool> UserExist(int userId)
         {
-            return _context.Users.Any(x => x.Id == userId);
+            return await _context.Users.AnyAsync(x => x.Id == userId);
         }
 
         public async Task<bool> UserExists(string email)

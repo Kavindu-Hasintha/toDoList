@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using toDoAPI.Dto;
@@ -21,55 +22,52 @@ namespace toDoAPI.Controllers
             _userRepository = userRepository;
             _mapper = mapper;
         }
-        /*
-        [HttpGet("{userId}")]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Todo>))]
-        public IActionResult GetTodos(int userId)
+        
+        [HttpGet]
+        [Route("getasksforuser")]
+        [Authorize]
+        public async Task<IActionResult> GetTasksForUser()
         {
-            if (!_userRepository.UserExist(userId))
+            int userId = await _userRepository.GetUserId();
+            if (userId == 0)
             {
                 return NotFound();
             }
 
-            var todos = _mapper.Map<List<TodoDto>>(_todoRepository.GetTodos(userId));
+            var todos = await _todoRepository.GetTodos(userId);
+
+            var mappedTodos = _mapper.Map<List<TodoDto>>(todos);
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
-            return Ok(todos);
+            return Ok(mappedTodos);
         }
 
+        
         [HttpPost]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        public IActionResult CreateTodo([FromQuery] int userId, [FromBody] TodoCreateDto todoCreate)
+        [Route("addtask")]
+        [Authorize]
+        public async Task<IActionResult> AddTask([FromBody] TodoCreateDto request)
         {
-            if (todoCreate == null)
+            if (request == null)
             {
-                return BadRequest(ModelState);
+                return BadRequest();
             }
 
-            if (todoCreate.TaskName.Length == 0 || todoCreate.StartDate.ToString().Length == 0 || todoCreate.DueDate.ToString().Length == 0)
+            int userId = await _userRepository.GetUserId();
+            if (userId == 0)
             {
-                ModelState.AddModelError("TodoError", "Please fill all the fields.");
-                return StatusCode(422, ModelState);
+                return BadRequest();
             }
 
-            var todo = _todoRepository.GetTodos()
-                .Where(t => t.TaskName.Trim().ToUpper() == todoCreate.TaskName.TrimEnd().ToUpper())
-                .FirstOrDefault();
+            var isTaskExist = await _todoRepository.TodoExists(userId, request.TaskName);
 
-            if (todo != null)
+            if (isTaskExist)
             {
                 ModelState.AddModelError("TodoError", "Todo already exists.");
                 return StatusCode(422, ModelState);
-            }
-
-            if (!_userRepository.UserExist(userId))
-            {
-                return NotFound();
             }
 
             if (!ModelState.IsValid) 
@@ -77,10 +75,12 @@ namespace toDoAPI.Controllers
                 return BadRequest(ModelState); 
             }
 
-            var todoMap = _mapper.Map<Todo>(todoCreate);
-            todoMap.User = _userRepository.GetUser(userId);
+            var todoMap = _mapper.Map<Todo>(request);
+            todoMap.UserId = userId;
 
-            if (!_todoRepository.CreateTodo(todoMap))
+            var isAdded = await _todoRepository.AddTodo(todoMap);
+
+            if (!isAdded)
             {
                 ModelState.AddModelError("TodoError", "Something went wrong while saving.");
                 return StatusCode(500, ModelState);
@@ -89,6 +89,7 @@ namespace toDoAPI.Controllers
             return Ok("Successfully Added.");
         }
 
+        /*
         [HttpPut]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

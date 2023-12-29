@@ -4,7 +4,7 @@
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserRepository _userRepository;
-        private readonly int RefreshTokenExpirationTime = 5;
+        private readonly int RefreshTokenExpirationTime = 25;
 
         public RefreshTokenService(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository)
         {

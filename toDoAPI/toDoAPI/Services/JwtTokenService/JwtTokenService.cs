@@ -37,7 +37,7 @@ namespace toDoAPI.Services.JwtTokenService
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(2),
+                expires: DateTime.Now.AddMinutes(10),
                 signingCredentials: creds
                 );
 
