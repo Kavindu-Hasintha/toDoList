@@ -22,6 +22,25 @@ namespace toDoAPI.Controllers
             _userRepository = userRepository;
             _mapper = mapper;
         }
+
+        [HttpGet]
+        [Route("getalltasks")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllTasks()
+        {
+            try
+            {
+                var tasks = await _todoRepository.GetAllTasksAsync();
+
+                var tasksMap = _mapper.Map<List<TodoDetailsDto>>(tasks);
+
+                return Ok(tasksMap);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
         
         [HttpGet]
         [Route("getasksforuser")]
@@ -139,33 +158,43 @@ namespace toDoAPI.Controllers
             }
         }
 
-        /*
-        [HttpDelete("{todoId}")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        public IActionResult DeleteTodo(int todoId)
+        
+        [HttpDelete]
+        [Route("deletetask")]
+        [Authorize]
+        public async Task<IActionResult> DeleteTask([FromQuery] int todoId)
         {
-            if (!_todoRepository.TodoExists(todoId))
+            try
             {
-                return NotFound();
+                var isTaskExist = await _todoRepository.TodoExists(todoId);
+                
+                if (!isTaskExist)
+                {
+                    return NotFound();
+                }
+
+                var todoDelete = await _todoRepository.GetTodoById(todoId);
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var isDeleted = await _todoRepository.DeleteTodo(todoDelete);
+
+                if (!isDeleted)
+                {
+                    ModelState.AddModelError("TodoError", "Something went wrong while deleting.");
+                    return StatusCode(500, ModelState);
+                }
+
+                return Ok("Successfully Deleted.");
             }
-
-            var todoDelete = _todoRepository.GetTodo(todoId);
-
-            if (!ModelState.IsValid)
+            catch (Exception ex)
             {
-                return BadRequest(ModelState);
+                return StatusCode(500, "Internal Server Error");
             }
-
-            if (!_todoRepository.DeleteTodo(todoDelete))
-            {
-                ModelState.AddModelError("TodoError", "Something went wrong while deleting.");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Successfully Deleted.");
         }
-        */
+        
     }
 }

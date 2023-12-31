@@ -12,9 +12,17 @@ namespace toDoAPI.Services.Todos
             _context = context;
         }
 
-        public ICollection<Todo> GetTodos()
+        public async Task<List<Todo>> GetAllTasksAsync()
         {
-            return _context.Todos.OrderBy(t => t.Id).ToList();
+            try
+            {
+                var tasks = await _context.Todos.OrderBy(t => t.Id).ToListAsync();
+                return tasks;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task<List<Todo>> GetTodos(int userId)
@@ -50,7 +58,8 @@ namespace toDoAPI.Services.Todos
                 _context.Update(todo);
                 _context.Entry(todo).Property(t => t.UserId).IsModified = false;
                 return await Save();
-            } catch(Exception ex)
+            } 
+            catch(Exception ex)
             {
                 return false;
             }
@@ -58,8 +67,15 @@ namespace toDoAPI.Services.Todos
 
         public async Task<bool> DeleteTodo(Todo todo)
         {
-            _context.Remove(todo);
-            return await Save();
+            try
+            {
+                _context.Remove(todo);
+                return await Save();
+            } 
+            catch(Exception ex)
+            {
+                return false;
+            }
         }
 
         public async Task<bool> Save()

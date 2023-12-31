@@ -4,7 +4,7 @@ namespace toDoAPI.Services.Todos
 {
     public interface ITodoRepository
     {
-        ICollection<Todo> GetTodos();
+        Task<List<Todo>> GetAllTasksAsync();
 
         Task<List<Todo>> GetTodos(int userId);
 
@@ -19,6 +19,7 @@ namespace toDoAPI.Services.Todos
         Task<bool> UpdateTodo(Todo todo);
 
         Task<bool> DeleteTodo(Todo todo);
+
         Task<bool> Save();
     }
 }

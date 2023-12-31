@@ -293,6 +293,66 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Delete task by Id",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoia2F2aW5kdUBnbWFpbC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTcwNDAxOTQxOH0.1EKqOLBP8UnxpoSSJXEjXiHL9i1NsYbslaWQSMx2i4dpTk81CK1Z_S4CacYIXBbxTSs1XiO5ELyEkI6wZdOBGQ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:7068/api/Todos/deletetask?todoId=4",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Todos",
+								"deletetask"
+							],
+							"query": [
+								{
+									"key": "todoId",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all tasks",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoia2F2aW5kdUBnbWFpbC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTcwNDAyMTYwOH0.mT52UBAsU2gWSg0yakvNRX7GSXt9GjGw1Qtw0gGZrfZThK1OGCg3hCHAZ3d8ZajnJatIDTkElmxAbek778ucOg",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:7068/api/Todos/getalltasks",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Todos",
+								"getalltasks"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}

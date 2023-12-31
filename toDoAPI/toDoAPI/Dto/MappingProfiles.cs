@@ -15,6 +15,7 @@ namespace toDoAPI.Dto
             CreateMap<Todo, TodoDto>();
             CreateMap<TodoDto, Todo>();
             CreateMap<TodoCreateDto, Todo>();
+            CreateMap<Todo, TodoDetailsDto>();
         }
     }
 }
