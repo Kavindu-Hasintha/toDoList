@@ -12,9 +12,17 @@ namespace toDoAPI.Services.Todos
             _context = context;
         }
 
-        public ICollection<Todo> GetTodos()
+        public async Task<List<Todo>> GetAllTasksAsync()
         {
-            return _context.Todos.OrderBy(t => t.Id).ToList();
+            try
+            {
+                var tasks = await _context.Todos.OrderBy(t => t.Id).ToListAsync();
+                return tasks;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task<List<Todo>> GetTodos(int userId)
@@ -22,14 +30,14 @@ namespace toDoAPI.Services.Todos
             return await _context.Todos.Where(t => t.UserId == userId).ToListAsync();
         }
 
-        public Todo GetTodo(int todoId)
+        public async Task<Todo> GetTodoById(int todoId)
         {
-            return _context.Todos.Where(t => t.Id == todoId).FirstOrDefault();
+            return await _context.Todos.FirstOrDefaultAsync(t => t.Id == todoId);
         }
 
-        public bool TodoExists(int todoId)
+        public async Task<bool> TodoExists(int todoId)
         {
-            return _context.Todos.Any(t => t.Id == todoId);
+            return await _context.Todos.AnyAsync(t => t.Id == todoId);
         }
 
         public async Task<bool> TodoExists(int userId, string name)
@@ -45,20 +53,43 @@ namespace toDoAPI.Services.Todos
 
         public async Task<bool> UpdateTodo(Todo todo)
         {
-            _context.Update(todo);
-            return await Save();
+            try
+            {
+                _context.Update(todo);
+                _context.Entry(todo).Property(t => t.UserId).IsModified = false;
+                return await Save();
+            } 
+            catch(Exception ex)
+            {
+                return false;
+            }
         }
 
         public async Task<bool> DeleteTodo(Todo todo)
         {
-            _context.Remove(todo);
-            return await Save();
+            try
+            {
+                _context.Remove(todo);
+                return await Save();
+            } 
+            catch(Exception ex)
+            {
+                return false;
+            }
         }
 
         public async Task<bool> Save()
         {
-            var saved = await _context.SaveChangesAsync();
-            return saved > 0 ? true : false;
+            try
+            {
+                var saved = await _context.SaveChangesAsync();
+                return saved > 0 ? true : false;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return false;
+            }
         }
 
     }

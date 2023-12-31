@@ -22,6 +22,25 @@ namespace toDoAPI.Controllers
             _userRepository = userRepository;
             _mapper = mapper;
         }
+
+        [HttpGet]
+        [Route("getalltasks")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllTasks()
+        {
+            try
+            {
+                var tasks = await _todoRepository.GetAllTasksAsync();
+
+                var tasksMap = _mapper.Map<List<TodoDetailsDto>>(tasks);
+
+                return Ok(tasksMap);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
         
         [HttpGet]
         [Route("getasksforuser")]
@@ -89,71 +108,93 @@ namespace toDoAPI.Controllers
             return Ok("Successfully Added.");
         }
 
-        /*
+        
         [HttpPut]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        public IActionResult UpdateTodo([FromBody] TodoDto todoUpdate)
+        [Route("updatetask")]
+        [Authorize]
+        public async Task<IActionResult> UpdateTask([FromBody] TodoDto todoUpdate)
         {
-            if (todoUpdate == null)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                if (todoUpdate == null)
+                {
+                    return BadRequest("Invalid request data");
+                }
 
-            if (!_todoRepository.TodoExists(todoUpdate.Id))
+                var isTaskExist = await _todoRepository.TodoExists(todoUpdate.Id);
+
+                if (!isTaskExist)
+                {
+                    return NotFound();
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var existingTodo = await _todoRepository.GetTodoById(todoUpdate.Id);
+
+                if (existingTodo == null)
+                {
+                    return NotFound();
+                }
+
+                _mapper.Map(todoUpdate, existingTodo);
+
+                var isUpdated = await _todoRepository.UpdateTodo(existingTodo);
+
+                if (!isUpdated)
+                {
+                    ModelState.AddModelError("TodoError", "Something went wrong while updating.");
+                    return StatusCode(500, ModelState);
+                }
+
+                return Ok("Successfully Updated.");
+            } 
+            catch (Exception ex)
             {
-                return NotFound();
+                return StatusCode(500, "Internal Server Error");
             }
-
-            if (todoUpdate.TaskName.Length == 0 || todoUpdate.StartDate.ToString().Length == 0 || todoUpdate.DueDate.ToString().Length == 0)
-            {
-                ModelState.AddModelError("TodoError", "Please fill all the fields.");
-                return StatusCode(422, ModelState);
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            var todoMap = _mapper.Map<Todo>(todoUpdate);
-
-            if (!_todoRepository.UpdateTodo(todoMap))
-            {
-                ModelState.AddModelError("TodoError", "Something went wrong while updating.");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Successfully Updated.");
         }
 
-        [HttpDelete("{todoId}")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        public IActionResult DeleteTodo(int todoId)
+        
+        [HttpDelete]
+        [Route("deletetask")]
+        [Authorize]
+        public async Task<IActionResult> DeleteTask([FromQuery] int todoId)
         {
-            if (!_todoRepository.TodoExists(todoId))
+            try
             {
-                return NotFound();
+                var isTaskExist = await _todoRepository.TodoExists(todoId);
+                
+                if (!isTaskExist)
+                {
+                    return NotFound();
+                }
+
+                var todoDelete = await _todoRepository.GetTodoById(todoId);
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var isDeleted = await _todoRepository.DeleteTodo(todoDelete);
+
+                if (!isDeleted)
+                {
+                    ModelState.AddModelError("TodoError", "Something went wrong while deleting.");
+                    return StatusCode(500, ModelState);
+                }
+
+                return Ok("Successfully Deleted.");
             }
-
-            var todoDelete = _todoRepository.GetTodo(todoId);
-
-            if (!ModelState.IsValid)
+            catch (Exception ex)
             {
-                return BadRequest(ModelState);
+                return StatusCode(500, "Internal Server Error");
             }
-
-            if (!_todoRepository.DeleteTodo(todoDelete))
-            {
-                ModelState.AddModelError("TodoError", "Something went wrong while deleting.");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Successfully Deleted.");
         }
-        */
+        
     }
 }
