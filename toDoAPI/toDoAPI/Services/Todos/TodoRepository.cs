@@ -17,9 +17,9 @@ namespace toDoAPI.Services.Todos
             return _context.Todos.OrderBy(t => t.Id).ToList();
         }
 
-        public ICollection<Todo> GetTodos(int userId)
+        public async Task<List<Todo>> GetTodos(int userId)
         {
-            return _context.Todos.Where(t => t.User.Id == userId).ToList();
+            return await _context.Todos.Where(t => t.UserId == userId).ToListAsync();
         }
 
         public Todo GetTodo(int todoId)
@@ -32,27 +32,32 @@ namespace toDoAPI.Services.Todos
             return _context.Todos.Any(t => t.Id == todoId);
         }
 
-        public bool CreateTodo(Todo todo)
+        public async Task<bool> TodoExists(int userId, string name)
+        {
+            return await _context.Todos.AnyAsync(t => t.UserId == userId && (t.TaskName.Trim().ToUpper() == name.Trim().ToUpper()));
+        }
+
+        public async Task<bool> AddTodo(Todo todo)
         {
             _context.Add(todo);
-            return Save();
+            return await Save();
         }
 
-        public bool UpdateTodo(Todo todo)
+        public async Task<bool> UpdateTodo(Todo todo)
         {
             _context.Update(todo);
-            return Save();
+            return await Save();
         }
 
-        public bool DeleteTodo(Todo todo)
+        public async Task<bool> DeleteTodo(Todo todo)
         {
             _context.Remove(todo);
-            return Save();
+            return await Save();
         }
 
-        public bool Save()
+        public async Task<bool> Save()
         {
-            var saved = _context.SaveChanges();
+            var saved = await _context.SaveChangesAsync();
             return saved > 0 ? true : false;
         }
 
