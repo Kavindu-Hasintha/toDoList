@@ -263,6 +263,36 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Update task",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": 0,\r\n  \"taskName\": \"string\",\r\n  \"startDate\": \"2023-12-31T09:49:03.998Z\",\r\n  \"dueDate\": \"2023-12-31T09:49:03.998Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7068/api/Todos/updatetask",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Todos",
+								"updatetask"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
