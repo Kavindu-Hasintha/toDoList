@@ -8,6 +8,8 @@
 
         Task<int> GetUserId();
 
+        Task<User> GetUserByEmailAsync();
+
         Task<Object> GetUserAsync(int userId);
 
         Task<User> GetUserAsync(string email);
