@@ -8,6 +8,10 @@
 
         Task<bool> UpdateForgetPassword(ForgetPassword request);
 
+        Task<bool> IsOTPVerified(string email);
+
+        Task<bool> DeleteOTP(string email);
+
         Task<bool> SaveChangesAsync();
     }
 }

@@ -224,6 +224,59 @@ namespace toDoAPI.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("addnewpassword")]
+        public async Task<IActionResult> AddNewPassword([FromBody] NewPassword newPassword)
+        {
+            try
+            {
+                if (newPassword == null)
+                {
+                    return BadRequest();
+                }
+
+                var isVerified = await _forgetPasswordService.IsOTPVerified(newPassword.Email);
+
+                if (!isVerified)
+                {
+                    return BadRequest("OTP is not verified");
+                }
+
+                var user = await _userRepository.GetUserAsync(newPassword.Email);
+
+                if (user == null)
+                {
+                    return BadRequest();
+                }
+
+                CreatePasswordHash(newPassword.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+                user.PasswordHash = passwordHash;
+                user.PasswordSalt = passwordSalt;
+
+                var isUserSaved = await _userRepository.UpdateUser(user);
+
+                if (!isUserSaved)
+                {
+                    return StatusCode(500, "Internal Server Error");
+                }
+
+                var isOTPDeleted = await _forgetPasswordService.DeleteOTP(newPassword.Email);
+
+                if (!isOTPDeleted)
+                {
+                    return StatusCode(500, "Internal Server Error");
+                }
+
+                return Ok("New password saved");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
+        }
+
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using(var hmac = new HMACSHA512())

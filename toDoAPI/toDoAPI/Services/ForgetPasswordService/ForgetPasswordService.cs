@@ -42,6 +42,33 @@ namespace toDoAPI.Services.ForgetPasswordService
             return await SaveChangesAsync();
         }
 
+        public async Task<bool> IsOTPVerified(string email)
+        {
+            try
+            {
+                var otp = await GetOTPByUsingEmailAsync(email);
+                return otp.IsOTPVerified;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteOTP(string email)
+        {
+            try
+            {
+                var otp = await GetOTPByUsingEmailAsync(email);
+                _context.Remove(otp);
+                return await SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
         public async Task<bool> SaveChangesAsync()
         {
             try
