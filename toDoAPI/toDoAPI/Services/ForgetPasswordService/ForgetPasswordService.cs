@@ -16,9 +16,10 @@ namespace toDoAPI.Services.ForgetPasswordService
         {
             try
             {
-                Models.ForgetPassword data = new Models.ForgetPassword();
+                ForgetPassword data = new ForgetPassword();
                 data.Email = userEmail;
                 data.OTP = otp;
+                data.IsOTPVerified = false;
                 data.Expires = DateTime.UtcNow.AddMinutes(OTPExpireTime);
 
                 _context.Add(data);
@@ -28,6 +29,17 @@ namespace toDoAPI.Services.ForgetPasswordService
             {
                 return false;
             }
+        }
+
+        public async Task<ForgetPassword> GetOTPByUsingEmailAsync(string email)
+        {
+            return await _context.ForgetPasswords.FirstOrDefaultAsync(f => f.Email == email);
+        }
+
+        public async Task<bool> UpdateForgetPassword(ForgetPassword request)
+        {
+            _context.Update(request);
+            return await SaveChangesAsync();
         }
 
         public async Task<bool> SaveChangesAsync()

@@ -12,15 +12,15 @@ namespace toDoAPI.Controllers
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IEmailService _emailService;
-        private readonly IForgetPassword _forgetPassword;
+        private readonly IForgetPasswordService _forgetPasswordService;
 
-        public AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService, IEmailService emailService, IForgetPassword forgetPassword)
+        public AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService, IEmailService emailService, IForgetPasswordService forgetPasswordService)
         {
             _userRepository = userRepository;
             _jwtTokenService = jwtTokenService;
             _refreshTokenService = refreshTokenService;
             _emailService = emailService;
-            _forgetPassword = forgetPassword;
+            _forgetPasswordService = forgetPasswordService;
         }
 
         [HttpPost]
@@ -152,7 +152,7 @@ namespace toDoAPI.Controllers
                     otp = _random.Next(100000, 999999 + 1);
                 }
 
-                var isOTPSaved = await _forgetPassword.SaveOTP(email, otp.ToString());
+                var isOTPSaved = await _forgetPasswordService.SaveOTP(email, otp.ToString());
 
                 if (!isOTPSaved)
                 {
@@ -170,6 +170,53 @@ namespace toDoAPI.Controllers
                 }
 
                 return Ok("OTP has sent to your email");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("otpverification")]
+        public async Task<IActionResult> OTPVerification([FromQuery] string email, [FromQuery] string otp)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(otp) || string.IsNullOrEmpty(email))
+                {
+                    return BadRequest();
+                }
+
+                var isEmailValid = await _userRepository.IsEmailValid(email);
+
+                if (!isEmailValid)
+                {
+                    return BadRequest();
+                }
+
+                var forgetPassword = await _forgetPasswordService.GetOTPByUsingEmailAsync(email);
+
+                if (forgetPassword == null)
+                {
+                    return BadRequest();
+                }
+
+                if (!forgetPassword.OTP.Equals(otp) || forgetPassword.Expires < DateTime.UtcNow)
+                {
+                    return BadRequest("OTP expired");
+                }
+
+                forgetPassword.IsOTPVerified = true;
+
+                var isSaved = await _forgetPasswordService.UpdateForgetPassword(forgetPassword);
+
+                if (!isSaved)
+                {
+                    return StatusCode(500, "Internal Server Error");
+                }
+
+                return Ok("OTP verified");
             }
             catch (Exception ex)
             {

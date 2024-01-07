@@ -123,7 +123,7 @@ namespace toDoAPI.Services.Users
             return saved > 0 ? true : false;
         }
 
-        public bool IsEmailValid(string email)
+        public async Task<bool> IsEmailValid(string email)
         {
             var emailValidation = new EmailAddressAttribute();
             return emailValidation.IsValid(email);

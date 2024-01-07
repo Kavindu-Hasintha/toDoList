@@ -30,6 +30,6 @@
 
         Task<bool> Save();
 
-        bool IsEmailValid(string email);
+        Task<bool> IsEmailValid(string email);
     }
 }
