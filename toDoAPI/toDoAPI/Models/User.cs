@@ -21,6 +21,9 @@
         public byte[] PasswordSalt { get; set; }
 
         [Required]
+        public string EmailPassword { get; set; } = string.Empty;
+
+        [Required]
         public Role UserRole { get; set; }
 
         public string RefreshToken { get; set; } = string.Empty;

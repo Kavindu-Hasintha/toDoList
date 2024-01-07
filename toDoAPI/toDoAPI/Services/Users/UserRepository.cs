@@ -29,6 +29,18 @@ namespace toDoAPI.Services.Users
             return user.Id;
         }
 
+        public async Task<User> GetUserByEmailAsync()
+        {
+                var email = string.Empty;
+                if (_httpContextAccessor.HttpContext != null)
+                {
+                    email = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
+                }
+
+                var user = await GetUserAsync(email);
+                return user;
+        }
+
         public ICollection<User> GetUsers()
         {
             return _context.Users.OrderBy(x => x.Id).ToList();

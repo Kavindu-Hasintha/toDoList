@@ -10,12 +10,14 @@ namespace toDoAPI.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IRefreshTokenService _refreshTokenService;
+        private readonly IEmailService _emailService;
 
-        public AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService)
+        public AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService, IEmailService emailService)
         {
             _userRepository = userRepository;
             _jwtTokenService = jwtTokenService;
             _refreshTokenService = refreshTokenService;
+            _emailService = emailService;
         }
 
         [HttpPost]
@@ -119,6 +121,49 @@ namespace toDoAPI.Controllers
             {
                 // Log the exception or handle it appropriately
                 return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        [HttpPost]
+        [Route("forgetpassword")]
+        public async Task<IActionResult> ForgetPassword([FromBody] string email)
+        {
+            try
+            {
+                if (email == null || email.Length == 0)
+                {
+                    return BadRequest();
+                }
+
+                var IsUserExists = await _userRepository.UserExists(email);
+
+                if (!IsUserExists)
+                {
+                    return BadRequest();
+                }
+
+                Random _random = new Random();
+                int otp = 0;
+                lock (_random) // Ensure thread safety
+                {
+                    otp = _random.Next(100000, 999999 + 1);
+                }
+
+                string subject = "OTP - Task Management System";
+                string body = otp.ToString() + ", this is your OTP.";
+
+                var isEmailSend = await _emailService.SendEmail("task@gmail.com", "taskPassword", email, subject, body);
+
+                if (!isEmailSend)
+                {
+                    return StatusCode(500, "Internal Server Error");
+                }
+
+                return Ok("OTP has sent to your email");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
