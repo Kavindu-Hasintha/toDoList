@@ -1,4 +1,5 @@
 ﻿using toDoAPI.Models;
+using toDoAPI.Services.ForgetPasswordService;
 using toDoAPI.Services.RefreshTokenService;
 
 namespace toDoAPI.Controllers
@@ -11,13 +12,15 @@ namespace toDoAPI.Controllers
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IEmailService _emailService;
+        private readonly IForgetPassword _forgetPassword;
 
-        public AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService, IEmailService emailService)
+        public AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService, IEmailService emailService, IForgetPassword forgetPassword)
         {
             _userRepository = userRepository;
             _jwtTokenService = jwtTokenService;
             _refreshTokenService = refreshTokenService;
             _emailService = emailService;
+            _forgetPassword = forgetPassword;
         }
 
         [HttpPost]
@@ -147,6 +150,13 @@ namespace toDoAPI.Controllers
                 lock (_random) // Ensure thread safety
                 {
                     otp = _random.Next(100000, 999999 + 1);
+                }
+
+                var isOTPSaved = await _forgetPassword.SaveOTP(email, otp.ToString());
+
+                if (!isOTPSaved)
+                {
+                    return StatusCode(500, "Internal Server Error");
                 }
 
                 string subject = "OTP - Task Management System";
