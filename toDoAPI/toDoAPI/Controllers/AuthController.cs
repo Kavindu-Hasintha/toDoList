@@ -49,6 +49,7 @@ namespace toDoAPI.Controllers
                 Email = request.Email,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
+                IsVerified = false,
                 UserRole = request.UserRole
             };
 
@@ -60,7 +61,7 @@ namespace toDoAPI.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return Ok("Successfully Registered!");
+            return Ok("Account created. You need to verify your account to log in.");
         }
 
         [HttpPost]
@@ -148,12 +149,7 @@ namespace toDoAPI.Controllers
                     return BadRequest();
                 }
 
-                Random _random = new Random();
-                int otp = 0;
-                lock (_random) // Ensure thread safety
-                {
-                    otp = _random.Next(100000, 999999 + 1);
-                }
+                int otp = GetOTP();
 
                 var isOTPSaved = await _forgetPasswordService.SaveOTP(email, otp.ToString());
 
@@ -280,6 +276,60 @@ namespace toDoAPI.Controllers
 
         }
 
+        [HttpPost]
+        [Route("verifyaccount")]
+        public async Task<IActionResult> VerifyAccount([FromQuery] string email, [FromQuery] string verificationCode)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(verificationCode))
+                {
+                    return BadRequest("Verification code is null or empty");
+                }
+
+                var otp = await _forgetPasswordService.GetOTPByUsingEmailAsync(email);
+
+                if (otp == null)
+                {
+                    return BadRequest("OTP object is null");
+                }
+
+                if (!otp.OTP.Equals(verificationCode) || otp.Expires < DateTime.UtcNow || !otp.IsOTPVerified)
+                {
+                    return BadRequest("Not equal verification code or expired or OTP is verified");
+                }
+
+                var isOTPDeleted = await _forgetPasswordService.DeleteOTP(email);
+
+                if (!isOTPDeleted)
+                {
+                    return StatusCode(500, "Internal Server Error");
+                }
+
+                var user = await _userRepository.GetUserAsync(email);
+
+                if (user == null)
+                {
+                    return BadRequest();
+                }
+
+                user.IsVerified = true;
+
+                var isUserSaved = await _userRepository.UpdateUser(user);
+
+                if (!isUserSaved)
+                {
+                    return StatusCode(500, "Internal Server Error");
+                }
+
+                return Ok("Registration is success. Now, your account is verified.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using(var hmac = new HMACSHA512())
@@ -296,6 +346,17 @@ namespace toDoAPI.Controllers
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
+        }
+
+        private int GetOTP()
+        {
+            Random _random = new Random();
+            int otp = 0;
+            lock (_random) // Ensure thread safety
+            {
+                otp = _random.Next(100000, 999999 + 1);
+            }
+            return otp;
         }
     }
 }

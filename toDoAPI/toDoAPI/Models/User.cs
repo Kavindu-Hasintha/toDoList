@@ -23,6 +23,8 @@
         [Required]
         public string EmailPassword { get; set; } = string.Empty;
 
+        public bool IsVerified { get; set; }
+
         [Required]
         public Role UserRole { get; set; }
 
