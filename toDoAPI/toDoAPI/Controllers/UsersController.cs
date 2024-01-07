@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
 using toDoAPI.Dto;
 using toDoAPI.Models;
@@ -36,6 +37,42 @@ namespace toDoAPI.Controllers
             }
 
             return Ok(users);
+        }
+
+        [HttpPut]
+        [Route("setemailpassword")]
+        [Authorize]
+        public async Task<IActionResult> SetEmailPassword([FromQuery] string password)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(password))
+                {
+                    return BadRequest();
+                }
+
+                var user = await _userRepository.GetUserByEmailAsync();
+
+                if (user == null)
+                {
+                    return BadRequest();
+                }
+
+                user.EmailPassword = password;
+
+                var isSaved = await _userRepository.UpdateUser(user);
+
+                if (!isSaved)
+                {
+                    return StatusCode(500, "Internal Server Error");
+                }
+
+                return Ok("Updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
         /*
 
