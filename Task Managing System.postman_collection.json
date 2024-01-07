@@ -192,6 +192,94 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Forget password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7068/api/Auth/forgetpassword?email=usert7189@gmail.com",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Auth",
+								"forgetpassword"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "usert7189@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "OTP verification",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7068/api/Auth/otpverification?email=usert7189@gmail.com&otp=676216",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Auth",
+								"otpverification"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "usert7189@gmail.com"
+								},
+								{
+									"key": "otp",
+									"value": "676216"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add New Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"usert7189@gmail.com\",\r\n  \"password\": \"string\",\r\n  \"confirmPassword\": \"string\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7068/api/Auth/addnewpassword",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Auth",
+								"addnewpassword"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},

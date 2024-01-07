@@ -8,6 +8,9 @@ namespace toDoAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private readonly string TaskManageEmail = "taskmanage535@gmail.com";
+        private readonly string EmailPassword = "jucfmflgxtnaujjo";
+
         private readonly IUserRepository _userRepository;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IRefreshTokenService _refreshTokenService;
@@ -129,7 +132,7 @@ namespace toDoAPI.Controllers
 
         [HttpPost]
         [Route("forgetpassword")]
-        public async Task<IActionResult> ForgetPassword([FromBody] string email)
+        public async Task<IActionResult> ForgetPassword([FromQuery] string email)
         {
             try
             {
@@ -162,7 +165,7 @@ namespace toDoAPI.Controllers
                 string subject = "OTP - Task Management System";
                 string body = otp.ToString() + ", this is your OTP.";
 
-                var isEmailSend = await _emailService.SendEmail("task@gmail.com", "taskPassword", email, subject, body);
+                var isEmailSend = await _emailService.SendEmail(TaskManageEmail, EmailPassword, email, subject, body);
 
                 if (!isEmailSend)
                 {
