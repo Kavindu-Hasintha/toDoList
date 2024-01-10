@@ -5,7 +5,7 @@ namespace toDoAPI.Services.ForgetPasswordService
     public class ForgetPasswordService : IForgetPasswordService
     {
         private readonly DataContext _context;
-        private readonly int OTPExpireTime = 30;
+        private readonly int OTPExpireTime = 5;
 
         public ForgetPasswordService(DataContext context)
         {

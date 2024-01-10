@@ -294,11 +294,26 @@ namespace toDoAPI.Controllers
                     return BadRequest("OTP object is null");
                 }
 
-                if (!otp.OTP.Equals(verificationCode) || otp.Expires < DateTime.UtcNow || !otp.IsOTPVerified)
+                if (otp.OTP != verificationCode)
+                {
+                    return BadRequest("Verification code is wrong");
+                }
+
+                if (otp.Expires < DateTime.UtcNow)
+                {
+                    return BadRequest("Verification token is expired");
+                }
+
+                if (otp.IsOTPVerified)
+                {
+                    return BadRequest("OTP is already verified");
+                }
+                /*
+                if (otp.OTP != verificationCode || otp.Expires < DateTime.Now. || !otp.IsOTPVerified)
                 {
                     return BadRequest("Not equal verification code or expired or OTP is verified");
                 }
-
+                */
                 var isOTPDeleted = await _forgetPasswordService.DeleteOTP(email);
 
                 if (!isOTPDeleted)
