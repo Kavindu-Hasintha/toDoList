@@ -35,5 +35,7 @@
         public DateTime TokenExpired { get; set; }
 
         public ICollection<Todo> Todos { get; set; }
+
+        public ICollection<Email> Emails { get; set; }
     }
 }

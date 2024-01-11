@@ -16,7 +16,7 @@
         [HttpPost]
         [Route("sendemail")]
         [Authorize]
-        public async Task<IActionResult> SendEmails([FromBody] Email request)
+        public async Task<IActionResult> SendEmails([FromBody] EmailDto request)
         {
             try
             {
