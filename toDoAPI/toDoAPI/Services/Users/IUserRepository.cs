@@ -18,6 +18,10 @@
 
         Task<User> GetUserAsyncByRefreshToken(string refreshToken);
 
+        Task<string> GetTaskManageEmail();
+
+        Task<string> GetTaskManagePassword();
+
         Task<bool> UserExist(int userId);
 
         Task<bool> UserExists(string email);

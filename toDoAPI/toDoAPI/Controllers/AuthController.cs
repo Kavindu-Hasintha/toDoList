@@ -8,9 +8,6 @@ namespace toDoAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly string TaskManageEmail = "taskmanage535@gmail.com";
-        private readonly string EmailPassword = "jucfmflgxtnaujjo";
-
         private readonly IUserRepository _userRepository;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IRefreshTokenService _refreshTokenService;
@@ -158,6 +155,9 @@ namespace toDoAPI.Controllers
                     return StatusCode(500, "Internal Server Error");
                 }
 
+                string taskManageEmail = await _userRepository.GetTaskManageEmail();
+                string taskManageEmailPassword = await _userRepository.GetTaskManagePassword();
+
                 EmailDto emailRequest = new EmailDto();
                 emailRequest.ToEmail = email;
                 emailRequest.CC = string.Empty;
@@ -165,7 +165,7 @@ namespace toDoAPI.Controllers
                 emailRequest.Subject = "Verification Code - Task Management System";
                 emailRequest.Body = verificationCode.ToString() + ", this is your Verification Code.";
 
-                var isEmailSend = await _emailService.SendEmail(TaskManageEmail, EmailPassword, emailRequest);
+                var isEmailSend = await _emailService.SendEmail(taskManageEmail, taskManageEmailPassword, emailRequest);
 
                 if (!isEmailSend)
                 {

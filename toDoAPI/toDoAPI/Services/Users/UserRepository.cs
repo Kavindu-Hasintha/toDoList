@@ -83,6 +83,18 @@ namespace toDoAPI.Services.Users
             return await _context.Users.Where(u => u.RefreshToken == refreshToken).FirstOrDefaultAsync();
         }
 
+        public async Task<string> GetTaskManageEmail()
+        {
+            var userAdmin = await _context.Users.Where(u => u.Id == 5).FirstOrDefaultAsync();
+            return userAdmin.Email;
+        }
+
+        public async Task<string> GetTaskManagePassword()
+        {
+            var userAdmin = await _context.Users.Where(u => u.Id == 5).FirstOrDefaultAsync();
+            return userAdmin.EmailPassword;
+        }
+
         public async Task<bool> UserExist(int userId)
         {
             return await _context.Users.AnyAsync(x => x.Id == userId);
