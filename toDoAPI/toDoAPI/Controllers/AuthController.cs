@@ -1,4 +1,5 @@
 ﻿using toDoAPI.Models;
+using toDoAPI.Services.ForgetPasswordService;
 using toDoAPI.Services.RefreshTokenService;
 
 namespace toDoAPI.Controllers
@@ -7,17 +8,22 @@ namespace toDoAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private readonly string TaskManageEmail = "taskmanage535@gmail.com";
+        private readonly string EmailPassword = "jucfmflgxtnaujjo";
+
         private readonly IUserRepository _userRepository;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IEmailService _emailService;
+        private readonly IForgetPasswordService _forgetPasswordService;
 
-        public AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService, IEmailService emailService)
+        public AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService, IEmailService emailService, IForgetPasswordService forgetPasswordService)
         {
             _userRepository = userRepository;
             _jwtTokenService = jwtTokenService;
             _refreshTokenService = refreshTokenService;
             _emailService = emailService;
+            _forgetPasswordService = forgetPasswordService;
         }
 
         [HttpPost]
@@ -43,6 +49,7 @@ namespace toDoAPI.Controllers
                 Email = request.Email,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
+                IsVerified = false,
                 UserRole = request.UserRole
             };
 
@@ -54,7 +61,7 @@ namespace toDoAPI.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return Ok("Successfully Registered!");
+            return Ok("Account created. You need to verify your account to log in.");
         }
 
         [HttpPost]
@@ -125,8 +132,8 @@ namespace toDoAPI.Controllers
         }
 
         [HttpPost]
-        [Route("forgetpassword")]
-        public async Task<IActionResult> ForgetPassword([FromBody] string email)
+        [Route("getverificationcode")]
+        public async Task<IActionResult> GetVerificationCode([FromQuery] string email)
         {
             try
             {
@@ -142,24 +149,198 @@ namespace toDoAPI.Controllers
                     return BadRequest();
                 }
 
-                Random _random = new Random();
-                int otp = 0;
-                lock (_random) // Ensure thread safety
+                int verificationCode = GetVerificationCode();
+
+                var isOTPSaved = await _forgetPasswordService.SaveOTP(email, verificationCode.ToString());
+
+                if (!isOTPSaved)
                 {
-                    otp = _random.Next(100000, 999999 + 1);
+                    return StatusCode(500, "Internal Server Error");
                 }
 
-                string subject = "OTP - Task Management System";
-                string body = otp.ToString() + ", this is your OTP.";
+                EmailDto emailRequest = new EmailDto();
+                emailRequest.ToEmail = email;
+                emailRequest.CC = string.Empty;
+                emailRequest.BCC = string.Empty;
+                emailRequest.Subject = "Verification Code - Task Management System";
+                emailRequest.Body = verificationCode.ToString() + ", this is your Verification Code.";
 
-                var isEmailSend = await _emailService.SendEmail("task@gmail.com", "taskPassword", email, subject, body);
+                var isEmailSend = await _emailService.SendEmail(TaskManageEmail, EmailPassword, emailRequest);
 
                 if (!isEmailSend)
                 {
                     return StatusCode(500, "Internal Server Error");
                 }
-
                 return Ok("OTP has sent to your email");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("forgetpasswordverification")]
+        public async Task<IActionResult> ForgetPasswordVerification([FromQuery] string email, [FromQuery] string otp)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(otp) || string.IsNullOrEmpty(email))
+                {
+                    return BadRequest();
+                }
+
+                var isEmailValid = await _userRepository.IsEmailValid(email);
+
+                if (!isEmailValid)
+                {
+                    return BadRequest();
+                }
+
+                var forgetPassword = await _forgetPasswordService.GetOTPByUsingEmailAsync(email);
+
+                if (forgetPassword == null)
+                {
+                    return BadRequest();
+                }
+
+                if (!forgetPassword.OTP.Equals(otp) || forgetPassword.Expires < DateTime.UtcNow)
+                {
+                    return BadRequest("OTP expired");
+                }
+
+                forgetPassword.IsOTPVerified = true;
+
+                var isSaved = await _forgetPasswordService.UpdateForgetPassword(forgetPassword);
+
+                if (!isSaved)
+                {
+                    return StatusCode(500, "Internal Server Error");
+                }
+
+                return Ok("OTP verified");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("addnewpassword")]
+        public async Task<IActionResult> AddNewPassword([FromBody] NewPassword newPassword)
+        {
+            try
+            {
+                if (newPassword == null)
+                {
+                    return BadRequest();
+                }
+
+                var isVerified = await _forgetPasswordService.IsOTPVerified(newPassword.Email);
+
+                if (!isVerified)
+                {
+                    return BadRequest("OTP is not verified");
+                }
+
+                var user = await _userRepository.GetUserAsync(newPassword.Email);
+
+                if (user == null)
+                {
+                    return BadRequest();
+                }
+
+                CreatePasswordHash(newPassword.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+                user.PasswordHash = passwordHash;
+                user.PasswordSalt = passwordSalt;
+
+                var isUserSaved = await _userRepository.UpdateUser(user);
+
+                if (!isUserSaved)
+                {
+                    return StatusCode(500, "Internal Server Error");
+                }
+
+                var isOTPDeleted = await _forgetPasswordService.DeleteOTP(newPassword.Email);
+
+                if (!isOTPDeleted)
+                {
+                    return StatusCode(500, "Internal Server Error");
+                }
+
+                return Ok("New password saved");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
+        }
+
+        [HttpPost]
+        [Route("verifyaccount")]
+        public async Task<IActionResult> VerifyAccount([FromQuery] string email, [FromQuery] string verificationCode)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(verificationCode))
+                {
+                    return BadRequest("Verification code is null or empty");
+                }
+
+                var otp = await _forgetPasswordService.GetOTPByUsingEmailAsync(email);
+
+                if (otp == null)
+                {
+                    return BadRequest("OTP object is null");
+                }
+
+                if (otp.OTP != verificationCode)
+                {
+                    return BadRequest("Verification code is wrong");
+                }
+
+                if (otp.Expires < DateTime.UtcNow)
+                {
+                    return BadRequest("Verification token is expired");
+                }
+
+                if (otp.IsOTPVerified)
+                {
+                    return BadRequest("OTP is already verified");
+                }
+                /*
+                if (otp.OTP != verificationCode || otp.Expires < DateTime.Now. || !otp.IsOTPVerified)
+                {
+                    return BadRequest("Not equal verification code or expired or OTP is verified");
+                }
+                */
+                var isOTPDeleted = await _forgetPasswordService.DeleteOTP(email);
+
+                if (!isOTPDeleted)
+                {
+                    return StatusCode(500, "Internal Server Error");
+                }
+
+                var user = await _userRepository.GetUserAsync(email);
+
+                if (user == null)
+                {
+                    return BadRequest();
+                }
+
+                user.IsVerified = true;
+
+                var isUserSaved = await _userRepository.UpdateUser(user);
+
+                if (!isUserSaved)
+                {
+                    return StatusCode(500, "Internal Server Error");
+                }
+
+                return Ok("Registration is success. Now, your account is verified.");
             }
             catch (Exception ex)
             {
@@ -183,6 +364,17 @@ namespace toDoAPI.Controllers
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
+        }
+
+        private int GetVerificationCode()
+        {
+            Random _random = new Random();
+            int otp = 0;
+            lock (_random) // Ensure thread safety
+            {
+                otp = _random.Next(100000, 999999 + 1);
+            }
+            return otp;
         }
     }
 }

@@ -192,6 +192,194 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get verification code",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7068/api/Auth/getverificationcode?email=usert7189@gmail.com",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Auth",
+								"getverificationcode"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "usert7189@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forget password verification",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7068/api/Auth/forgetpasswordverification?email=usert7189@gmail.com&otp=358160",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Auth",
+								"forgetpasswordverification"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "usert7189@gmail.com"
+								},
+								{
+									"key": "otp",
+									"value": "358160"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add New Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"usert7189@gmail.com\",\r\n  \"password\": \"string123\",\r\n  \"confirmPassword\": \"string123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7068/api/Auth/addnewpassword",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Auth",
+								"addnewpassword"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set email password",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcnQ3MTg5QGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDQ2NTIwNjV9.0Oi3-XaoYwHd_VwkaHx_aV6qMVFu0zqTZlCMt6MK_wnk5lEYNvLyLf3S-eVzzivlTefBwFIW3RkaIxNKso2MuQ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:7068/api/Users/setemailpassword?password=dexeqvsrgzcslwfh",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Users",
+								"setemailpassword"
+							],
+							"query": [
+								{
+									"key": "password",
+									"value": "dexeqvsrgzcslwfh"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcnQ3MTg5QGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDUwNDM5MjN9.YZuYspBxEmivcjdCaxdUknQ97qzKjM786t8HsX_pwq1sA7TKAq3xai_AXWfntENGro25YN9gs5QGJvouQ8Pc6g",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"toEmail\": \"hkavindu64@gmail.com\",\r\n  \"cc\": \"\",\r\n  \"bcc\": \"\",\r\n  \"subject\": \"Task Management System\",\r\n  \"body\": \"Without cc, bcc\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:7068/api/Email/sendemail",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Email",
+								"sendemail"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify account",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7068/api/Auth/verifyaccount?email=taskmanage535@gmail.com&verificationCode=812580",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7068",
+							"path": [
+								"api",
+								"Auth",
+								"verifyaccount"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "taskmanage535@gmail.com"
+								},
+								{
+									"key": "verificationCode",
+									"value": "812580"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},

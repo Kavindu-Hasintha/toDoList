@@ -23,6 +23,8 @@
         [Required]
         public string EmailPassword { get; set; } = string.Empty;
 
+        public bool IsVerified { get; set; }
+
         [Required]
         public Role UserRole { get; set; }
 
@@ -33,5 +35,7 @@
         public DateTime TokenExpired { get; set; }
 
         public ICollection<Todo> Todos { get; set; }
+
+        public ICollection<Email> Emails { get; set; }
     }
 }

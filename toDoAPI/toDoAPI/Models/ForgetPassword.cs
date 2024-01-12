@@ -13,6 +13,9 @@
         public string OTP { get; set; } = string.Empty;
 
         [Required]
+        public bool IsOTPVerified { get; set; }
+
+        [Required]
         public DateTime Expires { get; set; }
     }
 }

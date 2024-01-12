@@ -16,7 +16,7 @@
         [HttpPost]
         [Route("sendemail")]
         [Authorize]
-        public async Task<IActionResult> SendEmails([FromBody] Email request)
+        public async Task<IActionResult> SendEmails([FromBody] EmailDto request)
         {
             try
             {
@@ -27,7 +27,7 @@
 
                 var user = await _userRepository.GetUserByEmailAsync();
 
-                var isSent = await _emailService.SendEmail(user.Email , user.EmailPassword, request.ToEmail, request.Subject, request.Body);
+                var isSent = await _emailService.SendEmail(user.Email , user.EmailPassword, request);
 
                 if (!isSent)
                 {
