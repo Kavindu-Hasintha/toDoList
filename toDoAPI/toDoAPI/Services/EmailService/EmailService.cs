@@ -1,7 +1,15 @@
-﻿namespace toDoAPI.Services.EmailService
+﻿using toDoAPI.Repositories.UserRepository;
+
+namespace toDoAPI.Services.EmailService
 {
     public class EmailService : IEmailService
     {
+        private readonly IEmailRepository _emailRepository;
+        public EmailService(IEmailRepository emailRepository) 
+        {
+            _emailRepository = emailRepository;
+        }
+
         public async Task<bool> SendEmail(string fromMail, string fromPassword, EmailDto request)
         {
             try
@@ -29,6 +37,9 @@
                     EnableSsl = true
                 };
                 smtpClient.Send(msg);
+
+                var isEmailSaved = await _emailRepository.AddEmail(fromMail, request);
+
                 return true;
             } 
             catch (Exception ex)

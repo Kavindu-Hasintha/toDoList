@@ -41,6 +41,16 @@ namespace toDoAPI.Services.Users
                 return user;
         }
 
+        public async Task<int> GetUserIdByEmailAsync(string email)
+        {
+            var user = await GetUserAsync(email);
+            if (user == null)
+            {
+                return 0;
+            }
+            return user.Id;
+        }
+
         public ICollection<User> GetUsers()
         {
             return _context.Users.OrderBy(x => x.Id).ToList();
@@ -119,8 +129,16 @@ namespace toDoAPI.Services.Users
 
         public async Task<bool> Save()
         {
-            var saved = await _context.SaveChangesAsync();
-            return saved > 0 ? true : false;
+            try
+            {
+                var saved = await _context.SaveChangesAsync();
+                return saved > 0 ? true : false;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return false;
+            }
         }
 
         public async Task<bool> IsEmailValid(string email)

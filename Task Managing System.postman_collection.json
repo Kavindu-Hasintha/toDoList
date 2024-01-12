@@ -194,12 +194,12 @@
 					"response": []
 				},
 				{
-					"name": "Forget password",
+					"name": "Get verification code",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "https://localhost:7068/api/Auth/forgetpassword?email=usert7189@gmail.com",
+							"raw": "https://localhost:7068/api/Auth/getverificationcode?email=usert7189@gmail.com",
 							"protocol": "https",
 							"host": [
 								"localhost"
@@ -208,7 +208,7 @@
 							"path": [
 								"api",
 								"Auth",
-								"forgetpassword"
+								"getverificationcode"
 							],
 							"query": [
 								{
@@ -221,12 +221,12 @@
 					"response": []
 				},
 				{
-					"name": "OTP verification",
+					"name": "Forget password verification",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "https://localhost:7068/api/Auth/otpverification?email=usert7189@gmail.com&otp=676216",
+							"raw": "https://localhost:7068/api/Auth/forgetpasswordverification?email=usert7189@gmail.com&otp=358160",
 							"protocol": "https",
 							"host": [
 								"localhost"
@@ -235,7 +235,7 @@
 							"path": [
 								"api",
 								"Auth",
-								"otpverification"
+								"forgetpasswordverification"
 							],
 							"query": [
 								{
@@ -244,7 +244,7 @@
 								},
 								{
 									"key": "otp",
-									"value": "676216"
+									"value": "358160"
 								}
 							]
 						}
@@ -258,7 +258,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"email\": \"usert7189@gmail.com\",\r\n  \"password\": \"string\",\r\n  \"confirmPassword\": \"string\"\r\n}",
+							"raw": "{\r\n  \"email\": \"usert7189@gmail.com\",\r\n  \"password\": \"string123\",\r\n  \"confirmPassword\": \"string123\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -321,13 +321,13 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcnQ3MTg5QGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDQ2NTIwNjV9.0Oi3-XaoYwHd_VwkaHx_aV6qMVFu0zqTZlCMt6MK_wnk5lEYNvLyLf3S-eVzzivlTefBwFIW3RkaIxNKso2MuQ",
+								"value": "bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlcnQ3MTg5QGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDUwNDM5MjN9.YZuYspBxEmivcjdCaxdUknQ97qzKjM786t8HsX_pwq1sA7TKAq3xai_AXWfntENGro25YN9gs5QGJvouQ8Pc6g",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"toEmail\": \"hkavindu64@gmail.com\",\r\n  \"subject\": \"Test email from Task Management system\",\r\n  \"body\": \"This is a test email for checking our system is working correctly!\"\r\n}",
+							"raw": "{\r\n  \"toEmail\": \"hkavindu64@gmail.com\",\r\n  \"cc\": \"\",\r\n  \"bcc\": \"\",\r\n  \"subject\": \"Task Management System\",\r\n  \"body\": \"Without cc, bcc\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
