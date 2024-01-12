@@ -9,10 +9,10 @@
         [Required, EmailAddress]
         public string From { get; set; } = string.Empty;
 
-        [EmailAddress]
+        [DataType(DataType.EmailAddress, ErrorMessage = "Invalid email address.")]
         public string CC { get; set; } = string.Empty;
 
-        [EmailAddress]
+        [DataType(DataType.EmailAddress, ErrorMessage = "Invalid email address.")]
         public string BCC { get; set; } = string.Empty;
 
         [Required, EmailAddress]

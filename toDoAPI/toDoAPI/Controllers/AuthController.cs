@@ -132,8 +132,8 @@ namespace toDoAPI.Controllers
         }
 
         [HttpPost]
-        [Route("forgetpassword")]
-        public async Task<IActionResult> ForgetPassword([FromQuery] string email)
+        [Route("getverificationcode")]
+        public async Task<IActionResult> GetVerificationCode([FromQuery] string email)
         {
             try
             {
@@ -149,25 +149,28 @@ namespace toDoAPI.Controllers
                     return BadRequest();
                 }
 
-                int otp = GetOTP();
+                int verificationCode = GetVerificationCode();
 
-                var isOTPSaved = await _forgetPasswordService.SaveOTP(email, otp.ToString());
+                var isOTPSaved = await _forgetPasswordService.SaveOTP(email, verificationCode.ToString());
 
                 if (!isOTPSaved)
                 {
                     return StatusCode(500, "Internal Server Error");
                 }
 
-                string subject = "OTP - Task Management System";
-                string body = otp.ToString() + ", this is your OTP.";
+                EmailDto emailRequest = new EmailDto();
+                emailRequest.ToEmail = email;
+                emailRequest.CC = string.Empty;
+                emailRequest.BCC = string.Empty;
+                emailRequest.Subject = "Verification Code - Task Management System";
+                emailRequest.Body = verificationCode.ToString() + ", this is your Verification Code.";
 
-                var isEmailSend = await _emailService.SendEmail(TaskManageEmail, EmailPassword, email, subject, body);
+                var isEmailSend = await _emailService.SendEmail(TaskManageEmail, EmailPassword, emailRequest);
 
                 if (!isEmailSend)
                 {
                     return StatusCode(500, "Internal Server Error");
                 }
-
                 return Ok("OTP has sent to your email");
             }
             catch (Exception ex)
@@ -177,8 +180,8 @@ namespace toDoAPI.Controllers
         }
 
         [HttpPost]
-        [Route("otpverification")]
-        public async Task<IActionResult> OTPVerification([FromQuery] string email, [FromQuery] string otp)
+        [Route("forgetpasswordverification")]
+        public async Task<IActionResult> ForgetPasswordVerification([FromQuery] string email, [FromQuery] string otp)
         {
             try
             {
@@ -363,7 +366,7 @@ namespace toDoAPI.Controllers
             }
         }
 
-        private int GetOTP()
+        private int GetVerificationCode()
         {
             Random _random = new Random();
             int otp = 0;
