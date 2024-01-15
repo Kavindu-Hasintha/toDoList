@@ -15,14 +15,16 @@ namespace toDoAPI.Controllers
     public class UsersController : Controller
     {
         private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
         private readonly ITodoRepository _todoRepository;
         private readonly IMapper _mapper;
 
-        public UsersController(IUserRepository userRepository, ITodoRepository todoRepository, IMapper mapper)
+        public UsersController(IUserRepository userRepository, ITodoRepository todoRepository, IMapper mapper, IUserService userService)
         {
             _userRepository = userRepository;
             _todoRepository = todoRepository;
             _mapper = mapper;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -74,28 +76,53 @@ namespace toDoAPI.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-        /*
+        
 
-        [HttpGet("{userId}")]
+        [HttpGet]
+        [Route("getuserbyid/{userId}")]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(400)]
-        public IActionResult GetUser(int userId) 
+        [Authorize]
+        public async Task<IActionResult> GetUserById(int userId) 
         {
-            if (!_userRepository.UserExist(userId))
+            try
             {
-                return NotFound();
-            }
+                var user = await _userService.GetUserById(userId);
 
-            var user = _mapper.Map<UserDto>(_userRepository.GetUser(userId));
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
-            if (!ModelState.IsValid)
+                return Ok(user);
+
+                /*
+                if (userId == null)
+                {
+                    return BadRequest();
+                }
+
+                if (!_userRepository.UserExist(userId))
+                {
+                    return NotFound();
+                }
+
+                var user = _mapper.Map<UserDto>(_userRepository.GetUser(userId));
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                return Ok(user);
+                */
+            } catch (Exception ex)
             {
-                return BadRequest(ModelState);
+                return StatusCode(500, ex.Message);
             }
-
-            return Ok(user);
         }
 
+        /*
         [HttpGet("getuserdetails{userId}")]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(400)]
