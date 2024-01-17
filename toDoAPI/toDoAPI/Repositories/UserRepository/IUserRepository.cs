@@ -4,5 +4,7 @@
     {
         Task<bool> UserExist(int userId);
         Task<User> GetUserAsync(int userId);
+        Task<bool> UpdateUserAsync(User user);
+        Task<bool> SaveChangesAsync();
     }
 }

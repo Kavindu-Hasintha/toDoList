@@ -8,13 +8,13 @@ namespace toDoAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userRepository;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IEmailService _emailService;
         private readonly IForgetPasswordService _forgetPasswordService;
 
-        public AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService, IEmailService emailService, IForgetPasswordService forgetPasswordService)
+        public AuthController(IUserService userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService, IEmailService emailService, IForgetPasswordService forgetPasswordService)
         {
             _userRepository = userRepository;
             _jwtTokenService = jwtTokenService;

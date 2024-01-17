@@ -3,10 +3,10 @@
     public class RefreshTokenService : IRefreshTokenService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userRepository;
         private readonly int RefreshTokenExpirationTime = 25;
 
-        public RefreshTokenService(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository)
+        public RefreshTokenService(IHttpContextAccessor httpContextAccessor, IUserService userRepository)
         {
             _httpContextAccessor = httpContextAccessor;
             _userRepository = userRepository;

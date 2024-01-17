@@ -4,9 +4,16 @@ namespace toDoAPI.Dto
 {
     public class UserChangeDetailsDto
     {
+        [Required]
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
+
+        [Required]
+        [MaxLength(255)]
+        public string Name { get; set; } = string.Empty;
+
+        [Required]
+        [EmailAddress]
+        [MaxLength(200)]
+        public string Email { get; set; } 
     }
 }

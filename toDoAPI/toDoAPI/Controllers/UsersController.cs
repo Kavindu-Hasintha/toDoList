@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
 using toDoAPI.Dto;
+using toDoAPI.Enums;
 using toDoAPI.Models;
 using toDoAPI.Services.Todos;
 using toDoAPI.Services.Users;
@@ -14,12 +16,12 @@ namespace toDoAPI.Controllers
     [ApiController]
     public class UsersController : Controller
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userRepository;
         private readonly IUserService _userService;
         private readonly ITodoRepository _todoRepository;
         private readonly IMapper _mapper;
 
-        public UsersController(IUserRepository userRepository, ITodoRepository todoRepository, IMapper mapper, IUserService userService)
+        public UsersController(IUserService userRepository, ITodoRepository todoRepository, IMapper mapper, IUserService userService)
         {
             _userRepository = userRepository;
             _todoRepository = todoRepository;
@@ -220,13 +222,35 @@ namespace toDoAPI.Controllers
         }
         */
 
-        /*
+        
         [HttpPut]
+        [Route("updateuser")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public IActionResult UpdateUserDetails([FromBody] UserChangeDetailsDto userUpdate)
+        public async Task<IActionResult> UpdateUser([FromBody] UserChangeDetailsDto userUpdate)
         {
+            try
+            {
+                var result = await _userService.UpdateUserAsync(userUpdate);
+
+                return result switch
+                {
+                    UpdateUserResult.Success => NoContent(),
+                    UpdateUserResult.NotFound => NotFound(),
+                    UpdateUserResult.InvalidInput => StatusCode(422, ModelState),
+                    UpdateUserResult.InvalidEmail => StatusCode(422, ModelState),
+                    UpdateUserResult.Error => StatusCode(500, "Something went wrong while updating user"),
+                    _ => BadRequest(),
+                };
+
+            } catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
+            /*
             if (userUpdate == null)
             {
                 return BadRequest(ModelState);
@@ -263,8 +287,9 @@ namespace toDoAPI.Controllers
             }
 
             return Ok("Successfully updated.");
+            */
         }
-        */
+        
 
         /*
         [HttpDelete("{userId}")]

@@ -14,9 +14,9 @@ namespace toDoAPI.Controllers
     public class TodosController : Controller
     {
         private readonly ITodoRepository _todoRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userRepository;
         private readonly IMapper _mapper;
-        public TodosController (ITodoRepository todoRepository, IUserRepository userRepository, IMapper mapper)
+        public TodosController (ITodoRepository todoRepository, IUserService userRepository, IMapper mapper)
         {
             _todoRepository = todoRepository;
             _userRepository = userRepository;
