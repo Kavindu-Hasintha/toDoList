@@ -302,7 +302,7 @@ namespace toDoAPI.Controllers
         {
             try
             {
-                var result = await _userService.DeleteUserAsync();
+                var result = await _userService.DeleteUserByEmailAsync();
 
                 return result switch
                 {
@@ -315,35 +315,32 @@ namespace toDoAPI.Controllers
             {
                 return StatusCode(500, ex.Message);
             }
+        }
 
-
-            /*
-            if (!_userRepository.UserExist(userId))
+        [HttpDelete]
+        [Route("deleteuserbyid/{userId}")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> DeleteUserById([FromQuery] int userId)
+        {
+            try
             {
-                return NotFound();
-            }
+                var result = await _userService.DeleteUserByIdAsync(userId);
 
-            var userToDelete = _userRepository.GetUser(userId);
-
-            var todos = _todoRepository.GetTodos(userId);
-
-            foreach (var t in todos)
-            {
-                if (!_todoRepository.DeleteTodo(t))
+                return result switch
                 {
-                    ModelState.AddModelError("UserError", "Something went wrong while deleting.");
-                    return StatusCode(500, ModelState);
-                }
+                    OperationResult.Success => NoContent(),
+                    OperationResult.NotFound => NotFound(),
+                    OperationResult.Error => StatusCode(500, "Something went wrong while deleting user"),
+                    _ => BadRequest(),
+                };
             }
-
-            if (!_userRepository.DeleteUser(userToDelete))
+            catch (Exception ex)
             {
-                ModelState.AddModelError("UserError", "Something went wrong while deleting.");
-                return StatusCode(500, ModelState);
+                return StatusCode(500, ex.Message);
             }
-
-            return Ok("Successfully deleted.");
-            */
         }
     }
 }

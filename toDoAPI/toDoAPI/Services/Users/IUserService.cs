@@ -16,7 +16,7 @@ namespace toDoAPI.Services.Users
 
         Task<User> GetUserByEmailAsync();
 
-        Task<Object> GetUserAsync(int userId);
+        Task<User> GetUserAsync(int userId);
 
         Task<User> GetUserAsync(string email);
 
@@ -34,7 +34,11 @@ namespace toDoAPI.Services.Users
 
         Task<OperationResult> UpdateUserAsync(UserChangeDetailsDto userUpdate);
 
-        Task<OperationResult> DeleteUserAsync();
+        Task<OperationResult> DeleteUserByEmailAsync();
+
+        Task<OperationResult> DeleteUserByIdAsync(int userId);
+
+        Task<OperationResult> DeleteUserAsync(User deleteUser);
 
         Task<bool> UpdateUserRefreshToken(int userId, string newToken, DateTime created, DateTime expires);
 

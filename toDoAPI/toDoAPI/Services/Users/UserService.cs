@@ -91,7 +91,7 @@ namespace toDoAPI.Services.Users
             return _context.Users.Where(x => x.Email == email && x.Password == password).FirstOrDefault();
         }
         */
-        public async Task<Object> GetUserAsync(int userId)
+        public async Task<User> GetUserAsync(int userId)
         {
             // return await _context.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
 
@@ -184,11 +184,36 @@ namespace toDoAPI.Services.Users
             }
         }
 
-        public async Task<OperationResult> DeleteUserAsync()
+        public async Task<OperationResult> DeleteUserByEmailAsync()
         {
             try
             {
                 var deleteUser = await GetUserByEmailAsync();
+                return await DeleteUserAsync(deleteUser);
+            }
+            catch
+            {
+                return OperationResult.Error;
+            }
+        }
+
+        public async Task<OperationResult> DeleteUserByIdAsync(int userId)
+        {
+            try
+            {
+                User deleteUser = await GetUserAsync(userId);
+                return await DeleteUserAsync(deleteUser);
+            }
+            catch
+            {
+                return OperationResult.Error;
+            }
+        }
+
+        public async Task<OperationResult> DeleteUserAsync(User deleteUser)
+        {
+            try
+            {
                 if (deleteUser == null)
                 {
                     return OperationResult.NotFound;
