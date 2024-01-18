@@ -1,6 +1,6 @@
 ﻿namespace toDoAPI.Enums
 {
-    public enum UpdateUserResult
+    public enum OperationResult
     {
         Success,
         NotFound,

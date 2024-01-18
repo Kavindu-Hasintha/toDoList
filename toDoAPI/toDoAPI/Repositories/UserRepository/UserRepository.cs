@@ -37,6 +37,12 @@ namespace toDoAPI.Repositories.UserRepository
             return false;
         }
 
+        public async Task<bool> DeleteUserAsync(User user)
+        {
+            _context.Remove(user);
+            return await SaveChangesAsync();
+        }
+
         public async Task<bool> SaveChangesAsync()
         {
             try

@@ -32,11 +32,11 @@ namespace toDoAPI.Services.Users
 
         Task<bool> RegisterUser(User user);
 
-        Task<UpdateUserResult> UpdateUserAsync(UserChangeDetailsDto userUpdate);
+        Task<OperationResult> UpdateUserAsync(UserChangeDetailsDto userUpdate);
+
+        Task<OperationResult> DeleteUserAsync();
 
         Task<bool> UpdateUserRefreshToken(int userId, string newToken, DateTime created, DateTime expires);
-
-        Task<bool> DeleteUser(User user);
 
         Task<bool> Save();
 

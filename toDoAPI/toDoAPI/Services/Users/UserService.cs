@@ -4,18 +4,21 @@ using System.Security.Claims;
 using toDoAPI.Enums;
 using toDoAPI.Models;
 using toDoAPI.Repositories.UserRepository;
+using toDoAPI.Services.Todos;
 
 namespace toDoAPI.Services.Users
 {
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly ITodoRepository _todoRepository;
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public UserService(IUserRepository userRepository, DataContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public UserService(IUserRepository userRepository, ITodoRepository todoRepository, DataContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _userRepository = userRepository;
+            _todoRepository = todoRepository;
             _context = context;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -138,7 +141,7 @@ namespace toDoAPI.Services.Users
             return await Save();
         }
 
-        public async Task<UpdateUserResult> UpdateUserAsync(UserChangeDetailsDto userUpdate)
+        public async Task<OperationResult> UpdateUserAsync(UserChangeDetailsDto userUpdate)
         {
             try
             {
@@ -150,18 +153,18 @@ namespace toDoAPI.Services.Users
                 var isUserExists = await _userRepository.UserExist(userUpdate.Id);
                 if (!isUserExists)
                 {
-                    return UpdateUserResult.NotFound;
+                    return OperationResult.NotFound;
                 }
 
                 if (userUpdate.Name.Length == 0 || userUpdate.Email.Length == 0)
                 {
-                    return UpdateUserResult.InvalidInput;
+                    return OperationResult.InvalidInput;
                 }
 
                 var isEmailValid = await IsEmailValid(userUpdate.Email);
                 if (!isEmailValid)
                 {
-                    return UpdateUserResult.InvalidEmail;
+                    return OperationResult.InvalidEmail;
                 }
 
                 var userMap = _mapper.Map<User>(userUpdate);
@@ -170,14 +173,49 @@ namespace toDoAPI.Services.Users
 
                 if (!isUpdated)
                 {
-                    return UpdateUserResult.Error;
+                    return OperationResult.Error;
                 }
 
-                return UpdateUserResult.Success;
+                return OperationResult.Success;
             }
             catch
             {
-                return UpdateUserResult.Error;
+                return OperationResult.Error;
+            }
+        }
+
+        public async Task<OperationResult> DeleteUserAsync()
+        {
+            try
+            {
+                var deleteUser = await GetUserByEmailAsync();
+                if (deleteUser == null)
+                {
+                    return OperationResult.NotFound;
+                }
+
+                var todos = await _todoRepository.GetTodos(deleteUser.Id);
+
+                foreach (var t in todos)
+                {
+                    var isTaskDeleted = await _todoRepository.DeleteTodo(t);
+                    if (!isTaskDeleted)
+                    {
+                        return OperationResult.Error;
+                    }
+                }
+
+                var isUserDeleted = await _userRepository.DeleteUserAsync(deleteUser);
+                if (!isUserDeleted)
+                {
+                    return OperationResult.Error;
+                }
+
+                return OperationResult.Success;
+            }
+            catch
+            {
+                return OperationResult.Error;
             }
         }
 
@@ -197,11 +235,7 @@ namespace toDoAPI.Services.Users
             return await Save();
         }
 
-        public async Task<bool> DeleteUser(User user)
-        {
-            _context.Remove(user);
-            return await Save();
-        }
+
 
         public async Task<bool> Save()
         {

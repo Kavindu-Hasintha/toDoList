@@ -237,11 +237,11 @@ namespace toDoAPI.Controllers
 
                 return result switch
                 {
-                    UpdateUserResult.Success => NoContent(),
-                    UpdateUserResult.NotFound => NotFound(),
-                    UpdateUserResult.InvalidInput => StatusCode(422, ModelState),
-                    UpdateUserResult.InvalidEmail => StatusCode(422, ModelState),
-                    UpdateUserResult.Error => StatusCode(500, "Something went wrong while updating user"),
+                    OperationResult.Success => NoContent(),
+                    OperationResult.NotFound => NotFound(),
+                    OperationResult.InvalidInput => StatusCode(422, ModelState),
+                    OperationResult.InvalidEmail => StatusCode(422, ModelState),
+                    OperationResult.Error => StatusCode(500, "Something went wrong while updating user"),
                     _ => BadRequest(),
                 };
 
@@ -291,13 +291,33 @@ namespace toDoAPI.Controllers
         }
         
 
-        /*
-        [HttpDelete("{userId}")]
+        
+        [HttpDelete]
+        [Route("deleteuser")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public IActionResult DeleteUser(int userId)
+        public async Task<IActionResult> DeleteUser()
         {
+            try
+            {
+                var result = await _userService.DeleteUserAsync();
+
+                return result switch
+                {
+                    OperationResult.Success => NoContent(),
+                    OperationResult.NotFound => NotFound(),
+                    OperationResult.Error => StatusCode(500, "Something went wrong while deleting user"),
+                    _ => BadRequest(),
+                };
+            } catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
+
+            /*
             if (!_userRepository.UserExist(userId))
             {
                 return NotFound();
@@ -323,7 +343,7 @@ namespace toDoAPI.Controllers
             }
 
             return Ok("Successfully deleted.");
+            */
         }
-        */
     }
 }
