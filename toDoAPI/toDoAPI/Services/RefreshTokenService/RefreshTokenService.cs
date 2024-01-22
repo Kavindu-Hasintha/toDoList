@@ -1,14 +1,19 @@
-﻿namespace toDoAPI.Services.RefreshTokenService
+﻿using toDoAPI.Enums;
+using toDoAPI.Repositories.UserRepository;
+
+namespace toDoAPI.Services.RefreshTokenService
 {
     public class RefreshTokenService : IRefreshTokenService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUserService _userService;
         private readonly IUserRepository _userRepository;
         private readonly int RefreshTokenExpirationTime = 25;
 
-        public RefreshTokenService(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository)
+        public RefreshTokenService(IHttpContextAccessor httpContextAccessor, IUserService userService, IUserRepository userRepository)
         {
             _httpContextAccessor = httpContextAccessor;
+            _userService = userService;
             _userRepository = userRepository;
         }
 
@@ -50,6 +55,31 @@
             var isUpdated = await _userRepository.UpdateUserRefreshToken(userId, newRefreshToken.Token, newRefreshToken.Created, newRefreshToken.Expires);
         
             return isUpdated;
+        }
+
+        public async Task<OperationResult> DeleteRefreshTokenAsync()
+        {
+            try
+            {
+                var user = await _userService.GetUserByEmailAsync();
+                
+                if (user == null)
+                {
+                    return OperationResult.Error;
+                }
+
+                var isDeleted = await _userRepository.DeleteRefreshTokenByUserAsync(user);
+
+                if (!isDeleted)
+                {
+                    return OperationResult.Error;
+                }
+                return OperationResult.Success;
+            } 
+            catch (Exception ex)
+            {
+                return OperationResult.Error;
+            }
         }
     }
 }

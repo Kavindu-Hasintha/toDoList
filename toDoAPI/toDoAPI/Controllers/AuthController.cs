@@ -1,4 +1,5 @@
-﻿using toDoAPI.Models;
+﻿using toDoAPI.Enums;
+using toDoAPI.Models;
 using toDoAPI.Services.ForgetPasswordService;
 using toDoAPI.Services.RefreshTokenService;
 
@@ -8,16 +9,13 @@ namespace toDoAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly string TaskManageEmail = "taskmanage535@gmail.com";
-        private readonly string EmailPassword = "jucfmflgxtnaujjo";
-
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userRepository;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IEmailService _emailService;
         private readonly IForgetPasswordService _forgetPasswordService;
 
-        public AuthController(IUserRepository userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService, IEmailService emailService, IForgetPasswordService forgetPasswordService)
+        public AuthController(IUserService userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService, IEmailService emailService, IForgetPasswordService forgetPasswordService)
         {
             _userRepository = userRepository;
             _jwtTokenService = jwtTokenService;
@@ -158,6 +156,9 @@ namespace toDoAPI.Controllers
                     return StatusCode(500, "Internal Server Error");
                 }
 
+                string taskManageEmail = await _userRepository.GetTaskManageEmail();
+                string taskManageEmailPassword = await _userRepository.GetTaskManagePassword();
+
                 EmailDto emailRequest = new EmailDto();
                 emailRequest.ToEmail = email;
                 emailRequest.CC = string.Empty;
@@ -165,7 +166,7 @@ namespace toDoAPI.Controllers
                 emailRequest.Subject = "Verification Code - Task Management System";
                 emailRequest.Body = verificationCode.ToString() + ", this is your Verification Code.";
 
-                var isEmailSend = await _emailService.SendEmail(TaskManageEmail, EmailPassword, emailRequest);
+                var isEmailSend = await _emailService.SendEmail(taskManageEmail, taskManageEmailPassword, emailRequest);
 
                 if (!isEmailSend)
                 {
@@ -343,6 +344,29 @@ namespace toDoAPI.Controllers
                 return Ok("Registration is success. Now, your account is verified.");
             }
             catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("logout")]
+        [Authorize]
+        public async Task<IActionResult> LogOut()
+        {
+            try
+            {
+                var result = await _refreshTokenService.DeleteRefreshTokenAsync();
+
+                if (result == OperationResult.Success)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return BadRequest(new { error = result });
+                }
+            } catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }

@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
 using toDoAPI.Dto;
+using toDoAPI.Enums;
 using toDoAPI.Models;
 using toDoAPI.Services.Todos;
 using toDoAPI.Services.Users;
@@ -14,15 +16,17 @@ namespace toDoAPI.Controllers
     [ApiController]
     public class UsersController : Controller
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userRepository;
+        private readonly IUserService _userService;
         private readonly ITodoRepository _todoRepository;
         private readonly IMapper _mapper;
 
-        public UsersController(IUserRepository userRepository, ITodoRepository todoRepository, IMapper mapper)
+        public UsersController(IUserService userRepository, ITodoRepository todoRepository, IMapper mapper, IUserService userService)
         {
             _userRepository = userRepository;
             _todoRepository = todoRepository;
             _mapper = mapper;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -74,28 +78,53 @@ namespace toDoAPI.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-        /*
+        
 
-        [HttpGet("{userId}")]
+        [HttpGet]
+        [Route("getuserbyid/{userId}")]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(400)]
-        public IActionResult GetUser(int userId) 
+        [Authorize]
+        public async Task<IActionResult> GetUserById(int userId) 
         {
-            if (!_userRepository.UserExist(userId))
+            try
             {
-                return NotFound();
-            }
+                var user = await _userService.GetUserById(userId);
 
-            var user = _mapper.Map<UserDto>(_userRepository.GetUser(userId));
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
-            if (!ModelState.IsValid)
+                return Ok(user);
+
+                /*
+                if (userId == null)
+                {
+                    return BadRequest();
+                }
+
+                if (!_userRepository.UserExist(userId))
+                {
+                    return NotFound();
+                }
+
+                var user = _mapper.Map<UserDto>(_userRepository.GetUser(userId));
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                return Ok(user);
+                */
+            } catch (Exception ex)
             {
-                return BadRequest(ModelState);
+                return StatusCode(500, ex.Message);
             }
-
-            return Ok(user);
         }
 
+        /*
         [HttpGet("getuserdetails{userId}")]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(400)]
@@ -193,13 +222,35 @@ namespace toDoAPI.Controllers
         }
         */
 
-        /*
+        
         [HttpPut]
+        [Route("updateuser")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public IActionResult UpdateUserDetails([FromBody] UserChangeDetailsDto userUpdate)
+        public async Task<IActionResult> UpdateUser([FromBody] UserChangeDetailsDto userUpdate)
         {
+            try
+            {
+                var result = await _userService.UpdateUserAsync(userUpdate);
+
+                return result switch
+                {
+                    OperationResult.Success => NoContent(),
+                    OperationResult.NotFound => NotFound(),
+                    OperationResult.InvalidInput => StatusCode(422, ModelState),
+                    OperationResult.InvalidEmail => StatusCode(422, ModelState),
+                    OperationResult.Error => StatusCode(500, "Something went wrong while updating user"),
+                    _ => BadRequest(),
+                };
+
+            } catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
+            /*
             if (userUpdate == null)
             {
                 return BadRequest(ModelState);
@@ -236,42 +287,60 @@ namespace toDoAPI.Controllers
             }
 
             return Ok("Successfully updated.");
+            */
         }
-        */
+        
 
-        /*
-        [HttpDelete("{userId}")]
+        
+        [HttpDelete]
+        [Route("deleteuser")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public IActionResult DeleteUser(int userId)
+        public async Task<IActionResult> DeleteUser()
         {
-            if (!_userRepository.UserExist(userId))
+            try
             {
-                return NotFound();
-            }
+                var result = await _userService.DeleteUserByEmailAsync();
 
-            var userToDelete = _userRepository.GetUser(userId);
-
-            var todos = _todoRepository.GetTodos(userId);
-
-            foreach (var t in todos)
-            {
-                if (!_todoRepository.DeleteTodo(t))
+                return result switch
                 {
-                    ModelState.AddModelError("UserError", "Something went wrong while deleting.");
-                    return StatusCode(500, ModelState);
-                }
-            }
-
-            if (!_userRepository.DeleteUser(userToDelete))
+                    OperationResult.Success => NoContent(),
+                    OperationResult.NotFound => NotFound(),
+                    OperationResult.Error => StatusCode(500, "Something went wrong while deleting user"),
+                    _ => BadRequest(),
+                };
+            } catch (Exception ex)
             {
-                ModelState.AddModelError("UserError", "Something went wrong while deleting.");
-                return StatusCode(500, ModelState);
+                return StatusCode(500, ex.Message);
             }
-
-            return Ok("Successfully deleted.");
         }
-        */
+
+        [HttpDelete]
+        [Route("deleteuserbyid/{userId}")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> DeleteUserById([FromQuery] int userId)
+        {
+            try
+            {
+                var result = await _userService.DeleteUserByIdAsync(userId);
+
+                return result switch
+                {
+                    OperationResult.Success => NoContent(),
+                    OperationResult.NotFound => NotFound(),
+                    OperationResult.Error => StatusCode(500, "Something went wrong while deleting user"),
+                    _ => BadRequest(),
+                };
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

@@ -5,9 +5,9 @@
     public class EmailController : Controller
     {
         private readonly IEmailService _emailService;
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userRepository;
 
-        public EmailController(IEmailService emailService, IUserRepository userRepository)
+        public EmailController(IEmailService emailService, IUserService userRepository)
         {
             _emailService = emailService;
             _userRepository = userRepository;
