@@ -1,4 +1,5 @@
 ﻿using toDoAPI.Enums;
+using toDoAPI.Repositories.UserRepository;
 
 namespace toDoAPI.Services.RefreshTokenService
 {
@@ -6,10 +7,10 @@ namespace toDoAPI.Services.RefreshTokenService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserService _userService;
-        private readonly IUserService _userRepository;
+        private readonly IUserRepository _userRepository;
         private readonly int RefreshTokenExpirationTime = 25;
 
-        public RefreshTokenService(IHttpContextAccessor httpContextAccessor, IUserService userService, IUserService userRepository)
+        public RefreshTokenService(IHttpContextAccessor httpContextAccessor, IUserService userService, IUserRepository userRepository)
         {
             _httpContextAccessor = httpContextAccessor;
             _userService = userService;
@@ -60,8 +61,22 @@ namespace toDoAPI.Services.RefreshTokenService
         {
             try
             {
-                var email = await _userSer
-            } catch (Exception ex)
+                var user = await _userService.GetUserByEmailAsync();
+                
+                if (user == null)
+                {
+                    return OperationResult.Error;
+                }
+
+                var isDeleted = await _userRepository.DeleteRefreshTokenByUserAsync(user);
+
+                if (!isDeleted)
+                {
+                    return OperationResult.Error;
+                }
+                return OperationResult.Success;
+            } 
+            catch (Exception ex)
             {
                 return OperationResult.Error;
             }
