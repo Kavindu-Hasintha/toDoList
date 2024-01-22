@@ -43,6 +43,19 @@ namespace toDoAPI.Repositories.UserRepository
             return await SaveChangesAsync();
         }
 
+        public async Task<bool> DeleteRefreshTokenByUserAsync(User user)
+        {
+            if (user != null)
+            {
+                user.RefreshToken = string.Empty;
+                user.TokenCreated = new DateTime();
+                user.TokenExpired = new DateTime();
+
+                return await SaveChangesAsync();
+            }
+            return false;
+        }
+
         public async Task<bool> SaveChangesAsync()
         {
             try

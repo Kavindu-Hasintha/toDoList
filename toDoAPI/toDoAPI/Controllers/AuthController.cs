@@ -1,4 +1,5 @@
-﻿using toDoAPI.Models;
+﻿using toDoAPI.Enums;
+using toDoAPI.Models;
 using toDoAPI.Services.ForgetPasswordService;
 using toDoAPI.Services.RefreshTokenService;
 
@@ -343,6 +344,29 @@ namespace toDoAPI.Controllers
                 return Ok("Registration is success. Now, your account is verified.");
             }
             catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("logout")]
+        [Authorize]
+        public async Task<IActionResult> LogOut()
+        {
+            try
+            {
+                var result = await _refreshTokenService.DeleteRefreshTokenAsync();
+
+                if (result == OperationResult.Success)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return BadRequest(new { error = result });
+                }
+            } catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }

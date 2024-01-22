@@ -6,6 +6,7 @@
         Task<User> GetUserAsync(int userId);
         Task<bool> UpdateUserAsync(User user);
         Task<bool> DeleteUserAsync(User user);
+        Task<bool> DeleteRefreshTokenByUserAsync(User user);
         Task<bool> SaveChangesAsync();
     }
 }
