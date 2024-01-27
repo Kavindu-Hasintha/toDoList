@@ -1,5 +1,6 @@
 ﻿using toDoAPI.Enums;
 using toDoAPI.Models;
+using toDoAPI.Repositories.UserRepository;
 using toDoAPI.Services.ForgetPasswordService;
 using toDoAPI.Services.RefreshTokenService;
 
@@ -9,14 +10,16 @@ namespace toDoAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IUserService _userRepository;
+        private readonly IUserService _userService;
+        private readonly IUserRepository _userRepository;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IEmailService _emailService;
         private readonly IForgetPasswordService _forgetPasswordService;
 
-        public AuthController(IUserService userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService, IEmailService emailService, IForgetPasswordService forgetPasswordService)
+        public AuthController(IUserService userService, IUserRepository userRepository, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService, IEmailService emailService, IForgetPasswordService forgetPasswordService)
         {
+            _userService = userService;
             _userRepository = userRepository;
             _jwtTokenService = jwtTokenService;
             _refreshTokenService = refreshTokenService;
@@ -33,7 +36,7 @@ namespace toDoAPI.Controllers
                 return BadRequest();
             }
 
-            bool isUserExists = await _userRepository.UserExists(request.Email);
+            bool isUserExists = await _userRepository.UserExistsByEmailAsync(request.Email);
             if (isUserExists)
             {
                 return BadRequest("User already exists.");
@@ -51,7 +54,7 @@ namespace toDoAPI.Controllers
                 UserRole = request.UserRole
             };
 
-            var isUserSaved = await _userRepository.RegisterUser(user);
+            var isUserSaved = await _userService.RegisterUser(user);
 
             if (!isUserSaved)
             {
@@ -66,7 +69,7 @@ namespace toDoAPI.Controllers
         [Route("signin")]
         public async Task<IActionResult> SignIn([FromBody] UserSignInDto request)
         {
-            var user = await _userRepository.GetUserAsync(request.Email);
+            var user = await _userRepository.GetUserByEmailAsync(request.Email);
 
             if (user == null)
             {
@@ -106,7 +109,7 @@ namespace toDoAPI.Controllers
                     return Unauthorized("Refresh token is missing");
                 }
 
-                var user = await _userRepository.GetUserAsyncByRefreshToken(refreshToken);
+                var user = await _userRepository.GetUserByRefreshTokenAsync(refreshToken);
 
                 if (user == null || !user.RefreshToken.Equals(refreshToken))
                 {
@@ -140,7 +143,7 @@ namespace toDoAPI.Controllers
                     return BadRequest();
                 }
 
-                var IsUserExists = await _userRepository.UserExists(email);
+                var IsUserExists = await _userRepository.UserExistsByEmailAsync(email);
 
                 if (!IsUserExists)
                 {
@@ -156,8 +159,10 @@ namespace toDoAPI.Controllers
                     return StatusCode(500, "Internal Server Error");
                 }
 
-                string taskManageEmail = await _userRepository.GetTaskManageEmail();
-                string taskManageEmailPassword = await _userRepository.GetTaskManagePassword();
+                var taskManage = await _userRepository.GetTaskManageEmailPasswordAsync();
+
+                string taskManageEmail = taskManage.Email;
+                string taskManageEmailPassword = taskManage.EmailPassword;
 
                 EmailDto emailRequest = new EmailDto();
                 emailRequest.ToEmail = email;
@@ -191,7 +196,7 @@ namespace toDoAPI.Controllers
                     return BadRequest();
                 }
 
-                var isEmailValid = await _userRepository.IsEmailValid(email);
+                var isEmailValid = await _userService.IsEmailValid(email);
 
                 if (!isEmailValid)
                 {
@@ -245,7 +250,7 @@ namespace toDoAPI.Controllers
                     return BadRequest("OTP is not verified");
                 }
 
-                var user = await _userRepository.GetUserAsync(newPassword.Email);
+                var user = await _userRepository.GetUserByEmailAsync(newPassword.Email);
 
                 if (user == null)
                 {
@@ -257,7 +262,7 @@ namespace toDoAPI.Controllers
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
 
-                var isUserSaved = await _userRepository.UpdateUser(user);
+                var isUserSaved = await _userRepository.UpdateUserAsync(user);
 
                 if (!isUserSaved)
                 {
@@ -325,7 +330,7 @@ namespace toDoAPI.Controllers
                     return StatusCode(500, "Internal Server Error");
                 }
 
-                var user = await _userRepository.GetUserAsync(email);
+                var user = await _userRepository.GetUserByEmailAsync(email);
 
                 if (user == null)
                 {
@@ -334,7 +339,7 @@ namespace toDoAPI.Controllers
 
                 user.IsVerified = true;
 
-                var isUserSaved = await _userRepository.UpdateUser(user);
+                var isUserSaved = await _userRepository.UpdateUserAsync(user);
 
                 if (!isUserSaved)
                 {

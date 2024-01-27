@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using toDoAPI.Dto;
 
 namespace toDoAPI.Repositories.UserRepository
 {
@@ -15,9 +16,42 @@ namespace toDoAPI.Repositories.UserRepository
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         }
 
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task<User> GetUserByRefreshTokenAsync(string refreshToken)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        }
+
+        public async Task<TaskManageDto> GetTaskManageEmailPasswordAsync()
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == 5);
+
+            if (user != null)
+            {
+                TaskManageDto taskManageDto = new TaskManageDto();
+                taskManageDto.Email = user.Email;
+                taskManageDto.EmailPassword = user.EmailPassword;
+
+                return taskManageDto;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public async Task<bool> UserExist(int userId)
         {
             return await _context.Users.AnyAsync(x => x.Id == userId);
+        }
+
+        public async Task<bool> UserExistsByEmailAsync(string email)
+        {
+            return await _context.Users.AnyAsync(u => u.Email == email);
         }
 
         public async Task<bool> UpdateUserAsync(User user)
