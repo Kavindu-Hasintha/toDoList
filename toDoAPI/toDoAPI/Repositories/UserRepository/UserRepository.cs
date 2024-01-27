@@ -24,12 +24,28 @@ namespace toDoAPI.Repositories.UserRepository
         {
             // Implement the logic to update the user in the database
             // Example using Entity Framework:
-            var existingUser = _context.Users.FirstOrDefault(u => u.Id == user.Id);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
 
             if (existingUser != null)
             {
                 existingUser.Name = user.Name;
                 existingUser.Email = user.Email;
+
+                return await SaveChangesAsync();
+            }
+
+            return false;
+        }
+
+        public async Task<bool> UpdateUserRefreshTokenAsync(int userId, string token, DateTime created, DateTime expire)
+        {
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (existingUser != null) 
+            {
+                existingUser.RefreshToken = token;
+                existingUser.TokenCreated = created;
+                existingUser.TokenExpired = expire;
 
                 return await SaveChangesAsync();
             }

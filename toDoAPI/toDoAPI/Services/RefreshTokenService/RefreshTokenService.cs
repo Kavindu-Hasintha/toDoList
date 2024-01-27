@@ -52,7 +52,7 @@ namespace toDoAPI.Services.RefreshTokenService
 
             _httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
 
-            var isUpdated = await _userRepository.UpdateUserRefreshToken(userId, newRefreshToken.Token, newRefreshToken.Created, newRefreshToken.Expires);
+            var isUpdated = await _userRepository.UpdateUserRefreshTokenAsync(userId, newRefreshToken.Token, newRefreshToken.Created, newRefreshToken.Expires);
         
             return isUpdated;
         }
