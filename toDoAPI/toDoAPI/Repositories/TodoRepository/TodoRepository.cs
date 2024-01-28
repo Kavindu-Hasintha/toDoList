@@ -13,9 +13,24 @@
             return await _context.Todos.OrderBy(t => t.Id).ToListAsync();
         }
 
+        public async Task<Todo> GetTodoByIdAsync(int todoId)
+        {
+            return await _context.Todos.FirstOrDefaultAsync(t => t.Id == todoId);
+        }
+
         public async Task<IEnumerable<Todo>> GetTodosByUserIdAsync(int userId)
         {
             return await _context.Todos.Where(t => t.UserId == userId).ToListAsync();
+        }
+
+        public async Task<bool> TodoExistsByIdAsync(int todoId)
+        {
+            return await _context.Todos.AnyAsync(t => t.Id == todoId);
+        }
+
+        public async Task<bool> TodoExistsByUserIdTodoNameAsync(int userId, string name)
+        {
+            return await _context.Todos.AnyAsync(t => t.UserId == userId && (t.TaskName.Trim().ToUpper() == name.Trim().ToUpper()));
         }
 
         public async Task<bool> SaveChangesAsync()
