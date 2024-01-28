@@ -18,10 +18,10 @@ namespace toDoAPI.Controllers
     {
         private readonly IUserService _userRepository;
         private readonly IUserService _userService;
-        private readonly ITodoRepository _todoRepository;
+        private readonly ITodoService _todoRepository;
         private readonly IMapper _mapper;
 
-        public UsersController(IUserService userRepository, ITodoRepository todoRepository, IMapper mapper, IUserService userService)
+        public UsersController(IUserService userRepository, ITodoService todoRepository, IMapper mapper, IUserService userService)
         {
             _userRepository = userRepository;
             _todoRepository = todoRepository;

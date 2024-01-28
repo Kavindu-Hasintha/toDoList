@@ -4,10 +4,10 @@ using toDoAPI.Models;
 
 namespace toDoAPI.Services.Todos
 {
-    public class TodoRepository : ITodoRepository
+    public class TodoService : ITodoService
     {
         private readonly DataContext _context;
-        public TodoRepository(DataContext context)
+        public TodoService(DataContext context)
         {
             _context = context;
         }

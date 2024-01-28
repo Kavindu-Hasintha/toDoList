@@ -2,7 +2,7 @@
 
 namespace toDoAPI.Services.Todos
 {
-    public interface ITodoRepository
+    public interface ITodoService
     {
         Task<List<Todo>> GetAllTasksAsync();
 

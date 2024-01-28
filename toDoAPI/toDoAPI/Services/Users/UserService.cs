@@ -11,11 +11,11 @@ namespace toDoAPI.Services.Users
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly ITodoRepository _todoRepository;
+        private readonly ITodoService _todoRepository;
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public UserService(IUserRepository userRepository, ITodoRepository todoRepository, DataContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public UserService(IUserRepository userRepository, ITodoService todoRepository, DataContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _userRepository = userRepository;
             _todoRepository = todoRepository;
