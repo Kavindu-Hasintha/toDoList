@@ -42,23 +42,22 @@ namespace toDoAPI.Controllers
         [HttpGet]
         [Route("getasksforuser")]
         [Authorize]
-        public async Task<IActionResult> GetTasksForUser()
+        public async Task<IActionResult> GetTasksByUserId()
         {
-            int userId = await _userRepository.GetUserId();
-            if (userId == 0)
+            try
             {
-                return NotFound();
+                var tasks = await _todoService.GetTasksByUserId();
+
+                if (tasks == null)
+                {
+                    return NotFound();
+                }
+                return Ok(tasks);
             }
-
-            var todos = await _todoRepository.GetTodos(userId);
-
-            var mappedTodos = _mapper.Map<List<TodoDto>>(todos);
-
-            if (!ModelState.IsValid)
+            catch (Exception ex)
             {
-                return BadRequest(ModelState);
+                return StatusCode(500, "Internal Server Error");
             }
-            return Ok(mappedTodos);
         }
 
         

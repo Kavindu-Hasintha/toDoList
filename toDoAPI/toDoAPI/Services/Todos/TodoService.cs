@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using toDoAPI.Data;
+using toDoAPI.Dto;
+using toDoAPI.Enums;
 using toDoAPI.Models;
 using toDoAPI.Repositories.TodoRepository;
 
@@ -9,10 +11,12 @@ namespace toDoAPI.Services.Todos
     public class TodoService : ITodoService
     {
         private readonly ITodoRepository _todoRepository;
+        private readonly IUserService _userService;
         private readonly IMapper _mapper;
-        public TodoService(ITodoRepository todoRepository, IMapper mapper)
+        public TodoService(ITodoRepository todoRepository, IUserService userService, IMapper mapper)
         {
             _todoRepository = todoRepository;
+            _userService = userService;
             _mapper = mapper;
         }
 
@@ -20,6 +24,18 @@ namespace toDoAPI.Services.Todos
         {
             var tasks = await _todoRepository.GetAllTasksAsync();
             return _mapper.Map<List<TodoDetailsDto>>(tasks);
+        }
+
+        public async Task<IEnumerable<TodoDto>> GetTasksByUserId()
+        {
+            int userId = await _userService.GetUserId();
+            if (userId == 0)
+            {
+                return null;
+            }
+
+            var tasks = await _todoRepository.GetTodosByUserIdAsync(userId);
+            return _mapper.Map<List<TodoDto>>(tasks);
         }
 
         public async Task<List<Todo>> GetAllTasksAsync()
