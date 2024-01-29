@@ -13,12 +13,12 @@ namespace toDoAPI.Controllers
     [ApiController]
     public class TodosController : Controller
     {
-        private readonly ITodoService _todoRepository;
+        private readonly ITodoService _todoService;
         private readonly IUserService _userRepository;
         private readonly IMapper _mapper;
-        public TodosController (ITodoService todoRepository, IUserService userRepository, IMapper mapper)
+        public TodosController (ITodoService todoService, IUserService userRepository, IMapper mapper)
         {
-            _todoRepository = todoRepository;
+            _todoService = todoService;
             _userRepository = userRepository;
             _mapper = mapper;
         }
@@ -30,11 +30,8 @@ namespace toDoAPI.Controllers
         {
             try
             {
-                var tasks = await _todoRepository.GetAllTasksAsync();
-
-                var tasksMap = _mapper.Map<List<TodoDetailsDto>>(tasks);
-
-                return Ok(tasksMap);
+                var tasks = await _todoService.GetAllTasks();
+                return Ok(tasks);
             }
             catch (Exception ex)
             {

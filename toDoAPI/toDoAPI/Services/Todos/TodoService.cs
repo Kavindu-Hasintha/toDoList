@@ -1,15 +1,25 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using toDoAPI.Data;
 using toDoAPI.Models;
+using toDoAPI.Repositories.TodoRepository;
 
 namespace toDoAPI.Services.Todos
 {
     public class TodoService : ITodoService
     {
-        private readonly DataContext _context;
-        public TodoService(DataContext context)
+        private readonly ITodoRepository _todoRepository;
+        private readonly IMapper _mapper;
+        public TodoService(ITodoRepository todoRepository, IMapper mapper)
         {
-            _context = context;
+            _todoRepository = todoRepository;
+            _mapper = mapper;
+        }
+
+        public async Task<IEnumerable<TodoDetailsDto>> GetAllTasks()
+        {
+            var tasks = await _todoRepository.GetAllTasksAsync();
+            return _mapper.Map<List<TodoDetailsDto>>(tasks);
         }
 
         public async Task<List<Todo>> GetAllTasksAsync()

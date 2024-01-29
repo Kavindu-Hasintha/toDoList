@@ -33,6 +33,32 @@
             return await _context.Todos.AnyAsync(t => t.UserId == userId && (t.TaskName.Trim().ToUpper() == name.Trim().ToUpper()));
         }
 
+        public async Task<bool> AddTodo(Todo todo)
+        {
+            _context.Todos.Add(todo);
+            return await SaveChangesAsync();
+        }
+
+        public async Task<bool> UpdateTodo(Todo todo)
+        {
+            try
+            {
+                _context.Update(todo);
+                _context.Entry(todo).Property(t => t.UserId).IsModified = false;
+                return await SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteTodo(Todo todo)
+        {
+            _context.Remove(todo);
+            return await SaveChangesAsync();
+        }
+
         public async Task<bool> SaveChangesAsync()
         {
             try

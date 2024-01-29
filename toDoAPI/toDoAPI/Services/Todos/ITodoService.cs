@@ -4,6 +4,7 @@ namespace toDoAPI.Services.Todos
 {
     public interface ITodoService
     {
+        Task<IEnumerable<TodoDetailsDto>> GetAllTasks();
         Task<List<Todo>> GetAllTasksAsync();
 
         Task<List<Todo>> GetTodos(int userId);
