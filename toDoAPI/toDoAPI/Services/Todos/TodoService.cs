@@ -20,7 +20,50 @@ namespace toDoAPI.Services.Todos
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<TodoDetailsDto>> GetAllTasks()
+        public async Task<OperationResult> AddTodoAsync(TodoCreateDto request)
+        { 
+            try
+            {
+                if (request == null)
+                {
+                    throw new ArgumentNullException("Request body is null.");
+                }
+
+                int userId = await _userService.GetUserId();
+                if (userId == 0)
+                {
+                    return OperationResult.NotFound;
+                }
+
+                if (request.TaskName.Length == 0 || request.StartDate.ToString().Length == 0 || request.DueDate.ToString().Length == 0)
+                {
+                    return OperationResult.InvalidInput;
+                }
+
+                var isTodoExists = await _todoRepository.TodoExistsByUserIdTodoNameAsync(userId, request.TaskName);
+                if (isTodoExists)
+                {
+                    return OperationResult.AlreadyExists;
+                }
+
+                var todoMap = _mapper.Map<Todo>(request);
+                todoMap.UserId = userId;
+
+                var isAdded = await _todoRepository.AddTodo(todoMap);
+                if (!isAdded)
+                {
+                    return OperationResult.Error;
+                }
+
+                return OperationResult.Success;
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Error;
+            }
+        }
+
+            public async Task<IEnumerable<TodoDetailsDto>> GetAllTasks()
         {
             var tasks = await _todoRepository.GetAllTasksAsync();
             return _mapper.Map<List<TodoDetailsDto>>(tasks);

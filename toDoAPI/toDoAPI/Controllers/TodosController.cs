@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using toDoAPI.Dto;
+using toDoAPI.Enums;
 using toDoAPI.Models;
 using toDoAPI.Services.Todos;
 using toDoAPI.Services.Users;
@@ -66,6 +67,25 @@ namespace toDoAPI.Controllers
         [Authorize]
         public async Task<IActionResult> AddTask([FromBody] TodoCreateDto request)
         {
+            try
+            {
+                var result = await _todoService.AddTodoAsync(request);
+
+                return result switch
+                {
+                    OperationResult.Success => NoContent(),
+                    OperationResult.NotFound => NotFound(),
+                    OperationResult.InvalidInput => StatusCode(422, "Invalid Input"),
+                    OperationResult.AlreadyExists => StatusCode(422, "Task already exists"),
+                    OperationResult.Error => StatusCode(500, "Something went wrong while saving task"),
+                    _ => BadRequest(),
+                };
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error");
+            }
+            /*
             if (request == null)
             {
                 return BadRequest();
@@ -102,6 +122,7 @@ namespace toDoAPI.Controllers
             }
 
             return Ok("Successfully Added.");
+            */
         }
 
         

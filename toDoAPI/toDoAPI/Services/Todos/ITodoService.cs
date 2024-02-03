@@ -1,7 +1,12 @@
-﻿namespace toDoAPI.Services.Todos
+﻿using toDoAPI.Enums;
+
+namespace toDoAPI.Services.Todos
 {
     public interface ITodoService
     {
+        Task<OperationResult> AddTodoAsync(TodoCreateDto request);
+
+
         Task<IEnumerable<TodoDetailsDto>> GetAllTasks();
         Task<IEnumerable<TodoDto>> GetTasksByUserId();
         Task<List<Todo>> GetAllTasksAsync();
