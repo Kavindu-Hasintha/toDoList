@@ -12,6 +12,8 @@ global using System.Net.Mail;
 global using System.Net;
 global using Microsoft.AspNetCore.Authorization;
 global using toDoAPI.Services.EmailService;
+global using toDoAPI.Enums;
+global using toDoAPI.Services.Todos;
 using toDoAPI.Services.Todos;
 using toDoAPI.Services.Users;
 using toDoAPI.Services.JwtTokenService;

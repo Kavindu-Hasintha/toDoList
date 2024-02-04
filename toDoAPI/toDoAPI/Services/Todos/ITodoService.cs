@@ -6,6 +6,7 @@ namespace toDoAPI.Services.Todos
     {
         Task<OperationResult> AddTodoAsync(TodoCreateDto request);
         Task<OperationResult> UpdateTodoAsync(TodoDto request);
+        Task<OperationResult> DeleteTodoAsync(int todoId);
 
         Task<IEnumerable<TodoDetailsDto>> GetAllTasks();
         Task<IEnumerable<TodoDto>> GetTasksByUserId();

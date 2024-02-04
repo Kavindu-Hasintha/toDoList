@@ -100,7 +100,31 @@ namespace toDoAPI.Services.Todos
             }
         }
 
-            public async Task<IEnumerable<TodoDetailsDto>> GetAllTasks()
+        public async Task<OperationResult> DeleteTodoAsync(int todoId)
+        {
+            try
+            {
+                var todoDelete = await _todoRepository.GetTodoByIdAsync(todoId);
+                if (todoDelete == null)
+                {
+                    return OperationResult.NotFound;
+                }
+
+                var isDeleted = await _todoRepository.DeleteTodo(todoDelete);
+                if (!isDeleted)
+                {
+                    return OperationResult.Error;
+                }
+
+                return OperationResult.Success;
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Error;
+            }
+        }
+
+        public async Task<IEnumerable<TodoDetailsDto>> GetAllTasks()
         {
             var tasks = await _todoRepository.GetAllTasksAsync();
             return _mapper.Map<List<TodoDetailsDto>>(tasks);

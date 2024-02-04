@@ -1,27 +1,13 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using toDoAPI.Dto;
-using toDoAPI.Enums;
-using toDoAPI.Models;
-using toDoAPI.Services.Todos;
-using toDoAPI.Services.Users;
-
-namespace toDoAPI.Controllers
+﻿namespace toDoAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class TodosController : Controller
     {
         private readonly ITodoService _todoService;
-        private readonly IUserService _userRepository;
-        private readonly IMapper _mapper;
-        public TodosController (ITodoService todoService, IUserService userRepository, IMapper mapper)
+        public TodosController (ITodoService todoService)
         {
             _todoService = todoService;
-            _userRepository = userRepository;
-            _mapper = mapper;
         }
 
         [HttpGet]
@@ -144,6 +130,15 @@ namespace toDoAPI.Controllers
                 }
 
                 var result = await _todoService.UpdateTodoAsync(todoUpdate);
+
+                return result switch
+                {
+                    OperationResult.Success => NoContent(),
+                    OperationResult.InvalidInput => StatusCode(422, "Invalid Input"),
+                    OperationResult.NotFound => NotFound(),
+                    OperationResult.Error => StatusCode(500, "Something went wrong while updating task"),
+                    _ => BadRequest(),
+                };
                 /*
                 if (todoUpdate == null)
                 {
@@ -196,6 +191,21 @@ namespace toDoAPI.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var result = await _todoService.DeleteTodoAsync(todoId);
+
+                return result switch
+                {
+                    OperationResult.Success => NoContent(),
+                    OperationResult.NotFound => NotFound(),
+                    OperationResult.Error => StatusCode(500, "Something went wrong while deleting task"),
+                    _ => BadRequest(),
+                };
+                /*
                 var isTaskExist = await _todoRepository.TodoExists(todoId);
                 
                 if (!isTaskExist)
@@ -219,6 +229,7 @@ namespace toDoAPI.Controllers
                 }
 
                 return Ok("Successfully Deleted.");
+                */
             }
             catch (Exception ex)
             {
