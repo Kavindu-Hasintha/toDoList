@@ -76,44 +76,6 @@
             {
                 return StatusCode(500, "Internal Server Error");
             }
-            /*
-            if (request == null)
-            {
-                return BadRequest();
-            }
-
-            int userId = await _userRepository.GetUserId();
-            if (userId == 0)
-            {
-                return BadRequest();
-            }
-
-            var isTaskExist = await _todoRepository.TodoExists(userId, request.TaskName);
-
-            if (isTaskExist)
-            {
-                ModelState.AddModelError("TodoError", "Todo already exists.");
-                return StatusCode(422, ModelState);
-            }
-
-            if (!ModelState.IsValid) 
-            { 
-                return BadRequest(ModelState); 
-            }
-
-            var todoMap = _mapper.Map<Todo>(request);
-            todoMap.UserId = userId;
-
-            var isAdded = await _todoRepository.AddTodo(todoMap);
-
-            if (!isAdded)
-            {
-                ModelState.AddModelError("TodoError", "Something went wrong while saving.");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Successfully Added.");
-            */
         }
 
         
@@ -139,43 +101,6 @@
                     OperationResult.Error => StatusCode(500, "Something went wrong while updating task"),
                     _ => BadRequest(),
                 };
-                /*
-                if (todoUpdate == null)
-                {
-                    return BadRequest("Invalid request data");
-                }
-
-                var isTaskExist = await _todoRepository.TodoExists(todoUpdate.Id);
-
-                if (!isTaskExist)
-                {
-                    return NotFound();
-                }
-
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                var existingTodo = await _todoRepository.GetTodoById(todoUpdate.Id);
-
-                if (existingTodo == null)
-                {
-                    return NotFound();
-                }
-
-                _mapper.Map(todoUpdate, existingTodo);
-
-                var isUpdated = await _todoRepository.UpdateTodo(existingTodo);
-
-                if (!isUpdated)
-                {
-                    ModelState.AddModelError("TodoError", "Something went wrong while updating.");
-                    return StatusCode(500, ModelState);
-                }
-
-                return Ok("Successfully Updated.");
-                */
             } 
             catch (Exception ex)
             {
@@ -205,31 +130,6 @@
                     OperationResult.Error => StatusCode(500, "Something went wrong while deleting task"),
                     _ => BadRequest(),
                 };
-                /*
-                var isTaskExist = await _todoRepository.TodoExists(todoId);
-                
-                if (!isTaskExist)
-                {
-                    return NotFound();
-                }
-
-                var todoDelete = await _todoRepository.GetTodoById(todoId);
-
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                var isDeleted = await _todoRepository.DeleteTodo(todoDelete);
-
-                if (!isDeleted)
-                {
-                    ModelState.AddModelError("TodoError", "Something went wrong while deleting.");
-                    return StatusCode(500, ModelState);
-                }
-
-                return Ok("Successfully Deleted.");
-                */
             }
             catch (Exception ex)
             {
