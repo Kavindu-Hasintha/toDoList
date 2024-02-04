@@ -63,6 +63,43 @@ namespace toDoAPI.Services.Todos
             }
         }
 
+        public async Task<OperationResult> UpdateTodoAsync(TodoDto request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    throw new ArgumentNullException("Request body is null.");
+                }
+
+                if (request.TaskName.Length == 0 || request.StartDate.ToString().Length == 0 || request.DueDate.ToString().Length == 0)
+                {
+                    return OperationResult.InvalidInput;
+                }
+
+                var isTaskExists = await _todoRepository.TodoExistsByIdAsync(request.Id);
+                if (!isTaskExists)
+                {
+                    return OperationResult.NotFound;
+                }
+
+                var todoMap = _mapper.Map<Todo>(request);
+
+                var isUpdated = await _todoRepository.UpdateTodo(todoMap);
+                if (!isUpdated)
+                {
+                    return OperationResult.Error;
+                }
+
+                return OperationResult.Success;
+
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Error;
+            }
+        }
+
             public async Task<IEnumerable<TodoDetailsDto>> GetAllTasks()
         {
             var tasks = await _todoRepository.GetAllTasksAsync();

@@ -5,7 +5,7 @@ namespace toDoAPI.Services.Todos
     public interface ITodoService
     {
         Task<OperationResult> AddTodoAsync(TodoCreateDto request);
-
+        Task<OperationResult> UpdateTodoAsync(TodoDto request);
 
         Task<IEnumerable<TodoDetailsDto>> GetAllTasks();
         Task<IEnumerable<TodoDto>> GetTasksByUserId();

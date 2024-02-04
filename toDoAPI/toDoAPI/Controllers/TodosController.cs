@@ -69,6 +69,11 @@ namespace toDoAPI.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
                 var result = await _todoService.AddTodoAsync(request);
 
                 return result switch
@@ -133,6 +138,13 @@ namespace toDoAPI.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var result = await _todoService.UpdateTodoAsync(todoUpdate);
+                /*
                 if (todoUpdate == null)
                 {
                     return BadRequest("Invalid request data");
@@ -168,6 +180,7 @@ namespace toDoAPI.Controllers
                 }
 
                 return Ok("Successfully Updated.");
+                */
             } 
             catch (Exception ex)
             {
