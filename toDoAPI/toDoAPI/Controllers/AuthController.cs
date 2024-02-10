@@ -1,10 +1,4 @@
-﻿using toDoAPI.Enums;
-using toDoAPI.Models;
-using toDoAPI.Repositories.UserRepository;
-using toDoAPI.Services.ForgetPasswordService;
-using toDoAPI.Services.RefreshTokenService;
-
-namespace toDoAPI.Controllers
+﻿namespace toDoAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

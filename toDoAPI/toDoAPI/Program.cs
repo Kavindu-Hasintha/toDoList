@@ -16,18 +16,14 @@ global using toDoAPI.Enums;
 global using toDoAPI.Services.Todos;
 global using AutoMapper;
 global using toDoAPI.Repositories.TodoRepository;
-using toDoAPI.Services.Todos;
-using toDoAPI.Services.Users;
-using toDoAPI.Services.JwtTokenService;
-using toDoAPI.Services.RefreshTokenService;
+global using toDoAPI.Repositories.UserRepository;
+global using toDoAPI.Services.ForgetPasswordService;
+global using toDoAPI.Services.RefreshTokenService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
-using toDoAPI.Services.ForgetPasswordService;
-using toDoAPI.Repositories.UserRepository;
-using toDoAPI.Repositories.TodoRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
