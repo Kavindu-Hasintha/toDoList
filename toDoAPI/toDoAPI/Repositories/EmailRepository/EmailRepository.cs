@@ -6,16 +6,18 @@ namespace toDoAPI.Repositories.UserRepository
     {
         private readonly DataContext _context;
         private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
 
-        public EmailRepository(DataContext context, IUserRepository userRepository)
+        public EmailRepository(DataContext context, IUserRepository userRepository, IUserService userService)
         {
             _context = context;
             _userRepository = userRepository;
+            _userService = userService;
         }
 
         public async Task<bool> AddEmail(string from, EmailDto request)
         {
-            int userId = await _userRepository.GetUserIdByEmailAsync(from);
+            int userId = await _userService.GetUserIdByEmailAsync(from);
 
             Email email = new Email();
             email.From = from;

@@ -4,12 +4,12 @@
     [ApiController]
     public class UsersController : Controller
     {
-        private readonly IUserService _userRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly ITodoService _todoRepository;
         private readonly IMapper _mapper;
 
-        public UsersController(IUserService userRepository, ITodoService todoRepository, IMapper mapper, IUserService userService)
+        public UsersController(IUserRepository userRepository, ITodoService todoRepository, IMapper mapper, IUserService userService)
         {
             _userRepository = userRepository;
             _todoRepository = todoRepository;
@@ -21,7 +21,7 @@
         [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
         public IActionResult GetUsers()
         {
-            var users = _mapper.Map<List<UserChangeDetailsDto>>(_userRepository.GetUsers());
+            var users = _mapper.Map<List<UserChangeDetailsDto>>(_userService.GetUsers());
 
             if (!ModelState.IsValid)
             {
@@ -43,7 +43,7 @@
                     return BadRequest();
                 }
 
-                var user = await _userRepository.GetUserByEmailAsync();
+                var user = await _userService.GetUserByEmailAsync();
 
                 if (user == null)
                 {
@@ -52,7 +52,7 @@
 
                 user.EmailPassword = password;
 
-                var isSaved = await _userRepository.UpdateUser(user);
+                var isSaved = await _userRepository.UpdateUserAsync(user);
 
                 if (!isSaved)
                 {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Security.Claims;
 using toDoAPI.Enums;
 using toDoAPI.Models;
+using toDoAPI.Repositories.TodoRepository;
 using toDoAPI.Repositories.UserRepository;
 using toDoAPI.Services.Todos;
 
@@ -11,11 +12,11 @@ namespace toDoAPI.Services.Users
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly ITodoService _todoRepository;
+        private readonly ITodoRepository _todoRepository;
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public UserService(IUserRepository userRepository, ITodoService todoRepository, DataContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public UserService(IUserRepository userRepository, ITodoRepository todoRepository, DataContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _userRepository = userRepository;
             _todoRepository = todoRepository;
@@ -219,7 +220,7 @@ namespace toDoAPI.Services.Users
                     return OperationResult.NotFound;
                 }
 
-                var todos = await _todoRepository.GetTodos(deleteUser.Id);
+                var todos = await _todoRepository.GetTodosByUserIdAsync(deleteUser.Id);
 
                 foreach (var t in todos)
                 {
