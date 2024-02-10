@@ -35,8 +35,15 @@
 
         public async Task<bool> AddTodo(Todo todo)
         {
-            _context.Todos.Add(todo);
-            return await SaveChangesAsync();
+            try
+            {
+                _context.Todos.Add(todo);
+                return await SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         public async Task<bool> UpdateTodo(Todo todo)
@@ -55,8 +62,15 @@
 
         public async Task<bool> DeleteTodo(Todo todo)
         {
-            _context.Remove(todo);
-            return await SaveChangesAsync();
+            try
+            {
+                _context.Remove(todo);
+                return await SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         public async Task<bool> SaveChangesAsync()

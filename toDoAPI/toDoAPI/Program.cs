@@ -15,6 +15,7 @@ global using toDoAPI.Services.EmailService;
 global using toDoAPI.Enums;
 global using toDoAPI.Services.Todos;
 global using AutoMapper;
+global using toDoAPI.Repositories.TodoRepository;
 using toDoAPI.Services.Todos;
 using toDoAPI.Services.Users;
 using toDoAPI.Services.JwtTokenService;

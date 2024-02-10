@@ -2,7 +2,7 @@
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TodosController : Controller
+    public class TodosController : ControllerBase
     {
         private readonly ITodoService _todoService;
         public TodosController (ITodoService todoService)
@@ -17,7 +17,7 @@
         {
             try
             {
-                var tasks = await _todoService.GetAllTasks();
+                var tasks = await _todoService.GetAllTasksAsync();
                 return Ok(tasks);
             }
             catch (Exception ex)
@@ -33,7 +33,7 @@
         {
             try
             {
-                var tasks = await _todoService.GetTasksByUserId();
+                var tasks = await _todoService.GetTasksByUserIdAsync();
 
                 if (tasks == null)
                 {
