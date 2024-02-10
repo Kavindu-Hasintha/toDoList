@@ -1,26 +1,13 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using toDoAPI.Dto;
-using toDoAPI.Models;
-using toDoAPI.Services.Todos;
-using toDoAPI.Services.Users;
-
-namespace toDoAPI.Controllers
+﻿namespace toDoAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TodosController : Controller
+    public class TodosController : ControllerBase
     {
-        private readonly ITodoRepository _todoRepository;
-        private readonly IUserService _userRepository;
-        private readonly IMapper _mapper;
-        public TodosController (ITodoRepository todoRepository, IUserService userRepository, IMapper mapper)
+        private readonly ITodoService _todoService;
+        public TodosController (ITodoService todoService)
         {
-            _todoRepository = todoRepository;
-            _userRepository = userRepository;
-            _mapper = mapper;
+            _todoService = todoService;
         }
 
         [HttpGet]
@@ -30,11 +17,8 @@ namespace toDoAPI.Controllers
         {
             try
             {
-                var tasks = await _todoRepository.GetAllTasksAsync();
-
-                var tasksMap = _mapper.Map<List<TodoDetailsDto>>(tasks);
-
-                return Ok(tasksMap);
+                var tasks = await _todoService.GetAllTasksAsync();
+                return Ok(tasks);
             }
             catch (Exception ex)
             {
@@ -45,23 +29,22 @@ namespace toDoAPI.Controllers
         [HttpGet]
         [Route("getasksforuser")]
         [Authorize]
-        public async Task<IActionResult> GetTasksForUser()
+        public async Task<IActionResult> GetTasksByUserId()
         {
-            int userId = await _userRepository.GetUserId();
-            if (userId == 0)
+            try
             {
-                return NotFound();
+                var tasks = await _todoService.GetTasksByUserIdAsync();
+
+                if (tasks == null)
+                {
+                    return NotFound();
+                }
+                return Ok(tasks);
             }
-
-            var todos = await _todoRepository.GetTodos(userId);
-
-            var mappedTodos = _mapper.Map<List<TodoDto>>(todos);
-
-            if (!ModelState.IsValid)
+            catch (Exception ex)
             {
-                return BadRequest(ModelState);
+                return StatusCode(500, "Internal Server Error");
             }
-            return Ok(mappedTodos);
         }
 
         
@@ -70,42 +53,29 @@ namespace toDoAPI.Controllers
         [Authorize]
         public async Task<IActionResult> AddTask([FromBody] TodoCreateDto request)
         {
-            if (request == null)
+            try
             {
-                return BadRequest();
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-            int userId = await _userRepository.GetUserId();
-            if (userId == 0)
+                var result = await _todoService.AddTodoAsync(request);
+
+                return result switch
+                {
+                    OperationResult.Success => NoContent(),
+                    OperationResult.NotFound => NotFound(),
+                    OperationResult.InvalidInput => StatusCode(422, "Invalid Input"),
+                    OperationResult.AlreadyExists => StatusCode(422, "Task already exists"),
+                    OperationResult.Error => StatusCode(500, "Something went wrong while saving task"),
+                    _ => BadRequest(),
+                };
+            }
+            catch (Exception ex)
             {
-                return BadRequest();
+                return StatusCode(500, "Internal Server Error");
             }
-
-            var isTaskExist = await _todoRepository.TodoExists(userId, request.TaskName);
-
-            if (isTaskExist)
-            {
-                ModelState.AddModelError("TodoError", "Todo already exists.");
-                return StatusCode(422, ModelState);
-            }
-
-            if (!ModelState.IsValid) 
-            { 
-                return BadRequest(ModelState); 
-            }
-
-            var todoMap = _mapper.Map<Todo>(request);
-            todoMap.UserId = userId;
-
-            var isAdded = await _todoRepository.AddTodo(todoMap);
-
-            if (!isAdded)
-            {
-                ModelState.AddModelError("TodoError", "Something went wrong while saving.");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Successfully Added.");
         }
 
         
@@ -116,41 +86,21 @@ namespace toDoAPI.Controllers
         {
             try
             {
-                if (todoUpdate == null)
-                {
-                    return BadRequest("Invalid request data");
-                }
-
-                var isTaskExist = await _todoRepository.TodoExists(todoUpdate.Id);
-
-                if (!isTaskExist)
-                {
-                    return NotFound();
-                }
-
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
                 }
 
-                var existingTodo = await _todoRepository.GetTodoById(todoUpdate.Id);
+                var result = await _todoService.UpdateTodoAsync(todoUpdate);
 
-                if (existingTodo == null)
+                return result switch
                 {
-                    return NotFound();
-                }
-
-                _mapper.Map(todoUpdate, existingTodo);
-
-                var isUpdated = await _todoRepository.UpdateTodo(existingTodo);
-
-                if (!isUpdated)
-                {
-                    ModelState.AddModelError("TodoError", "Something went wrong while updating.");
-                    return StatusCode(500, ModelState);
-                }
-
-                return Ok("Successfully Updated.");
+                    OperationResult.Success => NoContent(),
+                    OperationResult.InvalidInput => StatusCode(422, "Invalid Input"),
+                    OperationResult.NotFound => NotFound(),
+                    OperationResult.Error => StatusCode(500, "Something went wrong while updating task"),
+                    _ => BadRequest(),
+                };
             } 
             catch (Exception ex)
             {
@@ -166,29 +116,20 @@ namespace toDoAPI.Controllers
         {
             try
             {
-                var isTaskExist = await _todoRepository.TodoExists(todoId);
-                
-                if (!isTaskExist)
-                {
-                    return NotFound();
-                }
-
-                var todoDelete = await _todoRepository.GetTodoById(todoId);
-
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
                 }
 
-                var isDeleted = await _todoRepository.DeleteTodo(todoDelete);
+                var result = await _todoService.DeleteTodoAsync(todoId);
 
-                if (!isDeleted)
+                return result switch
                 {
-                    ModelState.AddModelError("TodoError", "Something went wrong while deleting.");
-                    return StatusCode(500, ModelState);
-                }
-
-                return Ok("Successfully Deleted.");
+                    OperationResult.Success => NoContent(),
+                    OperationResult.NotFound => NotFound(),
+                    OperationResult.Error => StatusCode(500, "Something went wrong while deleting task"),
+                    _ => BadRequest(),
+                };
             }
             catch (Exception ex)
             {

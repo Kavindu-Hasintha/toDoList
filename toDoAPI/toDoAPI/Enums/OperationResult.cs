@@ -6,6 +6,8 @@
         NotFound,
         InvalidInput,
         InvalidEmail,
+        AlreadyExists,
+        ModelStateError,
         Error
     }
 }

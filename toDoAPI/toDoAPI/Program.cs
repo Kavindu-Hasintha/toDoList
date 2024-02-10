@@ -12,6 +12,10 @@ global using System.Net.Mail;
 global using System.Net;
 global using Microsoft.AspNetCore.Authorization;
 global using toDoAPI.Services.EmailService;
+global using toDoAPI.Enums;
+global using toDoAPI.Services.Todos;
+global using AutoMapper;
+global using toDoAPI.Repositories.TodoRepository;
 using toDoAPI.Services.Todos;
 using toDoAPI.Services.Users;
 using toDoAPI.Services.JwtTokenService;
@@ -23,6 +27,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using toDoAPI.Services.ForgetPasswordService;
 using toDoAPI.Repositories.UserRepository;
+using toDoAPI.Repositories.TodoRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +43,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITodoRepository, TodoRepository>();
+builder.Services.AddScoped<ITodoService, TodoService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
