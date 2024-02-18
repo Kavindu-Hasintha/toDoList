@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useHttp from "../hooks/use-http";
+import { SignIn } from "../utils/ApiFunctions";
 
 const Login = () => {
   const [login, setLogin] = useState({
@@ -37,26 +38,29 @@ const Login = () => {
     toast.success("Login Success.");
   };
 
-  const handleSignIn = async () => {
-    await sendLoginRequest(
-      {
-        url: "https://localhost:7068/api/Users/getUserId",
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: login,
-      },
-      checkUser
-    );
-
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    const data = await SignIn(login);
+    if (success) {
+      const token = data.token;
+    }
+    // await sendLoginRequest(
+    //   {
+    //     url: "https://localhost:7068/api/Users/getUserId",
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     data: login,
+    //   },
+    //   checkUser
+    // );
     // if (userId === 1) {
     //   navigate(userId + "/admindashboard");
     // } else {
     //   navigate(userId + "/home");
     // }
     // toast.success("Login Success.");
-
     // axios
     //   .post("https://localhost:7068/api/Users/getUserId", login)
     //   .then((res) => {
@@ -94,7 +98,7 @@ const Login = () => {
                     label="Username"
                     variant="outlined"
                     name="email"
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                   />
                 </div>
                 <div className="row my-4">
@@ -103,7 +107,7 @@ const Login = () => {
                     label="Password"
                     type="password"
                     name="password"
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                   />
                 </div>
                 <div className="row my-4">
