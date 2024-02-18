@@ -41,9 +41,14 @@ const Login = () => {
   const handleSignIn = async (e) => {
     e.preventDefault();
     const data = await SignIn(login);
-    if (success) {
+    if (data) {
       const token = data.token;
+    } else {
+      setError("Invalid username or password. Please try again.");
     }
+    setTimeout(() => {
+      setErrorMessage("");
+    }, 4000);
     // await sendLoginRequest(
     //   {
     //     url: "https://localhost:7068/api/Users/getUserId",

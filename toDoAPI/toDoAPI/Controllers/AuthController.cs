@@ -86,8 +86,7 @@
                 return BadRequest("Server error!");
             }
 
-            return Ok(token);
-
+            return Ok(new { token = token, refreshToken = refreshToken.Token, userRole = user.UserRole });
         }
 
         [HttpPost]
