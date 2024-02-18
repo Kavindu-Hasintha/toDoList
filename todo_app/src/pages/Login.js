@@ -40,14 +40,20 @@ const Login = () => {
 
   const handleSignIn = async (e) => {
     e.preventDefault();
-    const data = await SignIn(login);
-    if (data) {
-      const token = data.token;
+    const response = await SignIn(login);
+    if (response.status === 200) {
+      const token = response.data.token;
+      const refreshToken = response.data.refreshToken;
+      const userRole = response.data.userRole;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("userRole", userRole);
     } else {
       setError("Invalid username or password. Please try again.");
     }
     setTimeout(() => {
-      setErrorMessage("");
+      setError("");
     }, 4000);
     // await sendLoginRequest(
     //   {
@@ -84,8 +90,9 @@ const Login = () => {
 
   return (
     <div className={LoginStyles.backgroundImage}>
-      {isLoading && <div>Loading...</div>}
-      {!isLoading && (
+      {isLoading && !error && <div>Loading...</div>}
+      {!isLoading && error && <div className="text-danger">{error}</div>}
+      {!isLoading && !error && (
         <div>
           <Header name="" onHandleTopButton={handleSignupPage} pageId="0" />
           <div className="container mt-4 shadow p-4 mb-4 bg-white rounded">

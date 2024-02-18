@@ -18,11 +18,13 @@ export async function SignIn(signInData) {
       data: signInData,
     });
 
-    if (response.status === 200) {
-      return response.data;
-    } else {
-      return null;
-    }
+    return response;
+
+    // if (response.status === 200) {
+    //   return response.data;
+    // } else {
+    //   return null;
+    // }
   } catch (error) {
     console.log(error);
     return error;
