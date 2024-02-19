@@ -30,10 +30,10 @@ const Login = () => {
   // const { isLoading, error, sendRequest: sendLoginRequest } = useHttp();
 
   const checkUser = (id) => {
-    if (id === 1) {
-      navigate(id + "/admindashboard");
+    if (id === 0) {
+      navigate("/admindashboard");
     } else {
-      navigate(id + "/home");
+      navigate("/home");
     }
     toast.success("Login Success.");
   };
@@ -49,6 +49,8 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("userRole", userRole);
+
+      checkUser(userRole);
     } else {
       setError("Invalid username or password. Please try again.");
     }
@@ -90,16 +92,16 @@ const Login = () => {
 
   return (
     <div className={LoginStyles.backgroundImage}>
-      {isLoading && !error && <div>Loading...</div>}
-      {!isLoading && error && <div className="text-danger">{error}</div>}
-      {!isLoading && !error && (
-        <div>
-          <Header name="" onHandleTopButton={handleSignupPage} pageId="0" />
-          <div className="container mt-4 shadow p-4 mb-4 bg-white rounded">
-            <div className="row">
-              <div className="col-8">
-                <img src="https://picsum.photos/id/155/850/500" alt="login" />
-              </div>
+      <div>
+        <Header name="" onHandleTopButton={handleSignupPage} pageId="0" />
+        <div className="container mt-4 shadow p-4 mb-4 bg-white rounded">
+          <div className="row">
+            <div className="col-8">
+              <img src="https://picsum.photos/id/155/850/500" alt="login" />
+            </div>
+            {isLoading && !error && <div>Loading...</div>}
+            {!isLoading && error && <div className="text-danger">{error}</div>}
+            {!isLoading && !error && (
               <div className="col-4 bg-white d-inline px-5">
                 <div className="row text-start mb-4">
                   <h2>Sign In</h2>
@@ -134,11 +136,11 @@ const Login = () => {
                   <a href="#">Forgot your password?</a>
                 </div>
               </div>
-            </div>
+            )}
           </div>
-          <Footer />
         </div>
-      )}
+        <Footer />
+      </div>
     </div>
   );
 };

@@ -16,8 +16,8 @@ function App() {
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path=":id/home/*" element={<Home />} />
-          <Route path=":id/admindashboard/*" element={<AdminDashboard />} />
+          <Route path="/home/*" element={<Home />} />
+          <Route path="/admindashboard/*" element={<AdminDashboard />} />
           <Route path="*" element={<Navigate to="/welcome" replace />} />
         </Routes>
       </BrowserRouter>
