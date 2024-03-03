@@ -11,7 +11,7 @@ import axios from "axios";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
-import Link from "@mui/material/Link";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const Signup = () => {
   const [data, setData] = useState({
@@ -20,7 +20,7 @@ const Signup = () => {
     password: "",
     confirmPassword: "",
   });
-  const [rePass, setRePass] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSigninPage = () => {
@@ -31,24 +31,22 @@ const Signup = () => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
-  const rePassHandleChange = (e) => {
-    setRePass(e.target.value);
-  };
-
   const handleSignUp = () => {
-    if (data.password !== rePass) {
-      toast.error("Passwords aren't matching.");
-    } else {
-      axios
-        .post("https://localhost:7068/api/Users", data)
-        .then((res) => {
-          toast.success(res.data);
-          navigate("/");
-        })
-        .catch((err) => {
-          toast.error(err.response.data.UserError.errors[0].errorMessage);
-        });
-    }
+    setIsLoading(true);
+    // if (data.password !== rePass) {
+    //   toast.error("Passwords aren't matching.");
+    // } else {
+    //   axios
+    //     .post("https://localhost:7068/api/Users", data)
+    //     .then((res) => {
+    //       toast.success(res.data);
+    //       navigate("/");
+    //     })
+    //     .catch((err) => {
+    //       toast.error(err.response.data.UserError.errors[0].errorMessage);
+    //     });
+    // }
+    setIsLoading(false);
   };
 
   /*
@@ -173,9 +171,16 @@ const Signup = () => {
             />
           </Stack>
           <Stack spacing={2} direction={"column"} sx={{ marginTop: "25px" }}>
-            <Button variant="outlined" type="submit">
-              Sign Up
-            </Button>
+            {isLoading && (
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <CircularProgress />
+              </Box>
+            )}
+            {!isLoading && (
+              <Button variant="outlined" type="submit">
+                Sign Up
+              </Button>
+            )}
           </Stack>
         </form>
         <Stack

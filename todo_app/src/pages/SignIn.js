@@ -14,7 +14,9 @@ import { FilePresent } from "@mui/icons-material";
 // import { Button } from "react-bootstrap";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
-import Link from "@mui/material/Link";
+import CircularProgress from "@mui/material/CircularProgress";
+import { Link } from "react-router-dom";
+import { Typography } from "@mui/material";
 
 const Signin = () => {
   const [login, setLogin] = useState({
@@ -27,6 +29,10 @@ const Signin = () => {
 
   const handleSignupPage = () => {
     navigate("/signup");
+  };
+
+  const handleForgotPassword = () => {
+    navigate("/forget-password");
   };
 
   const handleInputChange = (e) => {
@@ -46,6 +52,7 @@ const Signin = () => {
 
   const handleSignIn = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const response = await SignIn(login);
     if (response.status === 200) {
       const token = response.data.token;
@@ -62,6 +69,7 @@ const Signin = () => {
     }
     setTimeout(() => {
       setError("");
+      setIsLoading(false);
     }, 4000);
     // await sendLoginRequest(
     //   {
@@ -190,11 +198,20 @@ const Signin = () => {
             />
           </Stack>
           <Stack spacing={2} direction={"column"} sx={{ marginTop: "25px" }}>
-            <Button variant="outlined" type="submit">
-              Sign In
-            </Button>
-            <Link href="#" underline="none">
-              {"Forgot Password?"}
+            {isLoading && (
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <CircularProgress />
+              </Box>
+            )}
+            {!isLoading && (
+              <Button variant="outlined" type="submit">
+                Sign In
+              </Button>
+            )}
+            <Link to="/forget-password" style={{ textDecoration: "none" }}>
+              <Typography sx={{ color: "#1976d2" }}>
+                Forgot Password?
+              </Typography>
             </Link>
           </Stack>
         </form>
