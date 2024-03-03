@@ -8,20 +8,26 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+import Link from "@mui/material/Link";
+
 const Signup = () => {
   const [data, setData] = useState({
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
   const [rePass, setRePass] = useState("");
   const navigate = useNavigate();
 
   const handleSigninPage = () => {
-    navigate("/");
+    navigate("/signin");
   };
 
-  const handleChange = (e) => {
+  const handleInputChange = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
@@ -45,6 +51,7 @@ const Signup = () => {
     }
   };
 
+  /*
   return (
     <div className={LoginStyles.backgroundImage}>
       <Header name="" onHandleTopButton={handleSigninPage} pageId="1" />
@@ -106,6 +113,83 @@ const Signup = () => {
       </div>
       <Footer />
     </div>
+  );
+  */
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Box
+        sx={{
+          width: "300px",
+          margin: "auto",
+          marginTop: "100px",
+          padding: "30px",
+          boxShadow: 3,
+          borderRadius: "16px",
+        }}
+      >
+        <form onSubmit={handleSignUp}>
+          <Stack spacing={2} direction={"column"}>
+            <TextField
+              label="Full Name"
+              variant="outlined"
+              // fullWidth
+              name="name"
+              value={data.name}
+              onChange={handleInputChange}
+              type="text"
+            />
+            <TextField
+              label="Email"
+              variant="outlined"
+              // fullWidth
+              name="email"
+              value={data.email}
+              onChange={handleInputChange}
+              type="email"
+            />
+            <TextField
+              label="Password"
+              variant="outlined"
+              // fullWidth
+              name="password"
+              value={data.password}
+              onChange={handleInputChange}
+              type="password"
+            />
+            <TextField
+              label="Confirm Password"
+              variant="outlined"
+              // fullWidth
+              name="confirmPassword"
+              value={data.confirmPassword}
+              onChange={handleInputChange}
+              type="password"
+            />
+          </Stack>
+          <Stack spacing={2} direction={"column"} sx={{ marginTop: "25px" }}>
+            <Button variant="outlined" type="submit">
+              Sign Up
+            </Button>
+          </Stack>
+        </form>
+        <Stack
+          spacing={2}
+          direction={"row"}
+          sx={{ justifyContent: "center", marginTop: "10px" }}
+        >
+          <p>Already have an account?</p>
+          <Button variant="text" onClick={handleSigninPage}>
+            Sign In
+          </Button>
+        </Stack>
+      </Box>
+    </Box>
   );
 };
 
