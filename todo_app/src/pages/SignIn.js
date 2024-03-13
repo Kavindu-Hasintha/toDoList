@@ -31,46 +31,51 @@ const Signin = () => {
     navigate("/signup");
   };
 
-  const handleForgotPassword = () => {
-    navigate("/forget-password");
-  };
-
   const handleInputChange = (e) => {
     setLogin({ ...login, [e.target.name]: e.target.value });
   };
 
-  // const { isLoading, error, sendRequest: sendLoginRequest } = useHttp();
-
-  const checkUser = (id) => {
-    if (id === 0) {
-      navigate("/admindashboard");
-    } else {
-      navigate("/home");
+  const checkUser = (userRole) => {
+    switch (userRole) {
+      case 0:
+        navigate("/admindashboard");
+        break;
+      case 1:
+        navigate("/home");
+        break;
+      default:
+        navigate("/welcome");
+        break;
     }
-    toast.success("Login Success.");
   };
 
   const handleSignIn = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    const response = await SignIn(login);
-    if (response.status === 200) {
-      const token = response.data.token;
-      const refreshToken = response.data.refreshToken;
-      const userRole = response.data.userRole;
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("userRole", userRole);
+    try {
+      const response = await SignIn(login);
+      if (response.status === 200) {
+        const { token, refreshToken, userRole } = response.data;
 
-      checkUser(userRole);
-    } else {
-      setError("Invalid username or password. Please try again.");
+        localStorage.setItem("token", token);
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("userRole", userRole);
+
+        checkUser(userRole);
+      } else if (response.status === 400) {
+        setError(response.data);
+      } else {
+        setError("An error occurred. Please try again later.");
+      }
+    } catch (error) {
+      setError("An error occurred while signing in. Please try again.");
+    } finally {
+      setTimeout(() => {
+        setError("");
+        setIsLoading(false);
+      }, 4000);
     }
-    setTimeout(() => {
-      setError("");
-      setIsLoading(false);
-    }, 4000);
     // await sendLoginRequest(
     //   {
     //     url: "https://localhost:7068/api/Users/getUserId",
@@ -176,6 +181,14 @@ const Signin = () => {
           borderRadius: "16px",
         }}
       >
+        {error && (
+          <Typography
+            color="red"
+            sx={{ textAlign: "left", marginBottom: "8px", fontSize: "0.85rem" }}
+          >
+            {error}
+          </Typography>
+        )}
         <form onSubmit={handleSignIn}>
           <Stack spacing={2} direction={"column"}>
             <TextField

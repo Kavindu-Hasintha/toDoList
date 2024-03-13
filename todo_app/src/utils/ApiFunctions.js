@@ -19,14 +19,7 @@ export async function SignIn(signInData) {
     });
 
     return response;
-
-    // if (response.status === 200) {
-    //   return response.data;
-    // } else {
-    //   return null;
-    // }
   } catch (error) {
-    console.log(error);
-    return error;
+    throw error;
   }
 }

@@ -33,6 +33,7 @@ const Signup = () => {
 
   const handleSignUp = () => {
     setIsLoading(true);
+    navigate("/fp-otp");
     // if (data.password !== rePass) {
     //   toast.error("Passwords aren't matching.");
     // } else {
