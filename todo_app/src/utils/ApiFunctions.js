@@ -11,15 +11,16 @@ const getRefreshToken = () => {
 };
 
 export async function SignIn(signInData) {
-  try {
-    const response = await axios({
-      method: "POST",
-      url: API_URL + "/api/Auth/signin",
-      data: signInData,
-    });
+  //try {
+  const response = await axios({
+    method: "POST",
+    url: API_URL + "/api/Auth/signin",
+    data: signInData,
+  });
 
-    return response;
-  } catch (error) {
-    throw error;
-  }
+  return response;
+  // } catch (error) {
+  //   console.log("a - " + error);
+  //   throw error;
+  // }
 }

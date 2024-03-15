@@ -83,7 +83,7 @@
 
             if (!isSetRefreshToken)
             {
-                return BadRequest("Server error!");
+                return StatusCode(500, "Internal Server Error!");
             }
 
             return Ok(new { token = token, refreshToken = refreshToken.Token, userRole = user.UserRole });
