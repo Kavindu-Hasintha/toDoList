@@ -12,6 +12,11 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import CircularProgress from "@mui/material/CircularProgress";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import { SignUp } from "../utils/ApiFunctions";
 
 const Signup = () => {
   const [data, setData] = useState({
@@ -19,8 +24,10 @@ const Signup = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    userRole: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSigninPage = () => {
@@ -31,23 +38,28 @@ const Signup = () => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async (e) => {
+    e.preventDefault();
     setIsLoading(true);
-    navigate("/fp-otp");
-    // if (data.password !== rePass) {
-    //   toast.error("Passwords aren't matching.");
-    // } else {
-    //   axios
-    //     .post("https://localhost:7068/api/Users", data)
-    //     .then((res) => {
-    //       toast.success(res.data);
-    //       navigate("/");
-    //     })
-    //     .catch((err) => {
-    //       toast.error(err.response.data.UserError.errors[0].errorMessage);
-    //     });
-    // }
-    setIsLoading(false);
+    try {
+      const response = await SignUp(data);
+      console.log(response);
+      if (response.status === 200) {
+        navigate("/fp-otp");
+      } else if (response.status === 400 || response.status === 500) {
+        setError(response.data);
+      } else {
+        console.log(response.data);
+        setError("An error occurred. Please try again later.");
+      }
+    } catch (error) {
+      setError("An error occurred while signing in. Please try again.");
+    } finally {
+      setTimeout(() => {
+        setError("");
+        setIsLoading(false);
+      }, 4000);
+    }
   };
 
   /*
@@ -137,7 +149,6 @@ const Signup = () => {
             <TextField
               label="Full Name"
               variant="outlined"
-              // fullWidth
               name="name"
               value={data.name}
               onChange={handleInputChange}
@@ -146,7 +157,6 @@ const Signup = () => {
             <TextField
               label="Email"
               variant="outlined"
-              // fullWidth
               name="email"
               value={data.email}
               onChange={handleInputChange}
@@ -155,7 +165,6 @@ const Signup = () => {
             <TextField
               label="Password"
               variant="outlined"
-              // fullWidth
               name="password"
               value={data.password}
               onChange={handleInputChange}
@@ -164,12 +173,25 @@ const Signup = () => {
             <TextField
               label="Confirm Password"
               variant="outlined"
-              // fullWidth
               name="confirmPassword"
               value={data.confirmPassword}
               onChange={handleInputChange}
               type="password"
             />
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Role</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                label="User Role"
+                id="userRole"
+                name="userRole"
+                value={data.userRole}
+                onChange={handleInputChange}
+              >
+                <MenuItem value={0}>Admin</MenuItem>
+                <MenuItem value={1}>User</MenuItem>
+              </Select>
+            </FormControl>
           </Stack>
           <Stack spacing={2} direction={"column"} sx={{ marginTop: "25px" }}>
             {isLoading && (
